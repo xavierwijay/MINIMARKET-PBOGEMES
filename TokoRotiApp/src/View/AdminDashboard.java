@@ -47,7 +47,7 @@ public class AdminDashboard extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jPanel1.setBackground(new java.awt.Color(255, 255, 204));
+        jPanel1.setBackground(new java.awt.Color(239, 231, 221));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(204, 51, 0));
@@ -93,7 +93,6 @@ public class AdminDashboard extends javax.swing.JFrame {
         jLabel5.setText("PILIHAN KATEGORI");
 
         cbKategori.setBackground(new java.awt.Color(153, 153, 153));
-        cbKategori.setForeground(new java.awt.Color(0, 0, 0));
         cbKategori.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ASIN", "MANIS", "TAWAR", "KERING" }));
         cbKategori.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

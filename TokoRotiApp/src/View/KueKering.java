@@ -31,8 +31,8 @@ public class KueKering extends javax.swing.JFrame {
         jPanel25 = new javax.swing.JPanel();
         jPanel26 = new javax.swing.JPanel();
         jLabel22 = new javax.swing.JLabel();
-        jLabel23 = new javax.swing.JLabel();
-        jLabel24 = new javax.swing.JLabel();
+        txtJudulMenu = new javax.swing.JLabel();
+        txtJudulKecilMenu = new javax.swing.JLabel();
         jPanel27 = new javax.swing.JPanel();
         jPanel28 = new javax.swing.JPanel();
         jLabel64 = new javax.swing.JLabel();
@@ -64,7 +64,7 @@ public class KueKering extends javax.swing.JFrame {
         jButton28 = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         jPanel32 = new javax.swing.JPanel();
-        jButton29 = new javax.swing.JButton();
+        b = new javax.swing.JButton();
         jButton30 = new javax.swing.JButton();
         jButton31 = new javax.swing.JButton();
         jButton32 = new javax.swing.JButton();
@@ -93,11 +93,11 @@ public class KueKering extends javax.swing.JFrame {
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        jLabel23.setFont(new java.awt.Font("Segoe UI Black", 1, 34)); // NOI18N
-        jLabel23.setText("Jelajahi Aneka Roti Lezat");
+        txtJudulMenu.setFont(new java.awt.Font("Segoe UI Black", 1, 34)); // NOI18N
+        txtJudulMenu.setText("Jelajahi Aneka Roti Lezat");
 
-        jLabel24.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel24.setText("Temukan Roti Pilihan Anda");
+        txtJudulKecilMenu.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtJudulKecilMenu.setText("Temukan Roti Pilihan Anda");
 
         jPanel27.setBackground(new java.awt.Color(193, 170, 137));
 
@@ -374,13 +374,13 @@ public class KueKering extends javax.swing.JFrame {
 
         jPanel32.setBackground(new java.awt.Color(210, 206, 206));
 
-        jButton29.setBackground(new java.awt.Color(175, 139, 87));
-        jButton29.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jButton29.setForeground(new java.awt.Color(255, 255, 255));
-        jButton29.setText("Kue Ulang Tahun");
-        jButton29.addActionListener(new java.awt.event.ActionListener() {
+        b.setBackground(new java.awt.Color(175, 139, 87));
+        b.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        b.setForeground(new java.awt.Color(255, 255, 255));
+        b.setText("Kue Ulang Tahun");
+        b.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton29ActionPerformed(evt);
+                bActionPerformed(evt);
             }
         });
 
@@ -415,7 +415,7 @@ public class KueKering extends javax.swing.JFrame {
             jPanel32Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel32Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton29)
+                .addComponent(b)
                 .addGap(18, 18, 18)
                 .addComponent(jButton30)
                 .addGap(18, 18, 18)
@@ -429,7 +429,7 @@ public class KueKering extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel32Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel32Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton29)
+                    .addComponent(b)
                     .addComponent(jButton30)
                     .addComponent(jButton31)
                     .addComponent(jButton32))
@@ -447,10 +447,10 @@ public class KueKering extends javax.swing.JFrame {
                         .addComponent(jPanel32, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel25Layout.createSequentialGroup()
                         .addGap(304, 304, 304)
-                        .addComponent(jLabel23))
+                        .addComponent(txtJudulMenu))
                     .addGroup(jPanel25Layout.createSequentialGroup()
                         .addGap(452, 452, 452)
-                        .addComponent(jLabel24)))
+                        .addComponent(txtJudulKecilMenu)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel25Layout.createSequentialGroup()
                 .addGroup(jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -463,9 +463,9 @@ public class KueKering extends javax.swing.JFrame {
             .addGroup(jPanel25Layout.createSequentialGroup()
                 .addComponent(jPanel26, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel23)
+                .addComponent(txtJudulMenu)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel24)
+                .addComponent(txtJudulKecilMenu)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel32, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -495,9 +495,9 @@ public class KueKering extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton31ActionPerformed
 
-    private void jButton29ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton29ActionPerformed
+    private void bActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton29ActionPerformed
+    }//GEN-LAST:event_bActionPerformed
 
     /**
      * @param args the command line arguments
@@ -525,18 +525,16 @@ public class KueKering extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton b;
     private javax.swing.JButton jButton25;
     private javax.swing.JButton jButton26;
     private javax.swing.JButton jButton27;
     private javax.swing.JButton jButton28;
-    private javax.swing.JButton jButton29;
     private javax.swing.JButton jButton30;
     private javax.swing.JButton jButton31;
     private javax.swing.JButton jButton32;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel23;
-    private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -565,5 +563,7 @@ public class KueKering extends javax.swing.JFrame {
     private javax.swing.JSpinner jSpinner15;
     private javax.swing.JSpinner jSpinner16;
     private javax.swing.JSpinner jSpinner4;
+    private javax.swing.JLabel txtJudulKecilMenu;
+    private javax.swing.JLabel txtJudulMenu;
     // End of variables declaration//GEN-END:variables
 }
