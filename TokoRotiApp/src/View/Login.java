@@ -237,6 +237,8 @@ public class Login extends javax.swing.JFrame {
 
     private void bttnBuatAkunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bttnBuatAkunActionPerformed
         // TODO add your handling code here:
+        new View.BuatAkun().setVisible(true);
+        this.setVisible(false);
     }//GEN-LAST:event_bttnBuatAkunActionPerformed
 
     private void bttnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bttnLoginActionPerformed
@@ -263,12 +265,12 @@ public class Login extends javax.swing.JFrame {
     boolean cl = ac.cekLogin(fullname, password, roleDB);
 
     if (cl) {
-        int jawab = javax.swing.JOptionPane.showConfirmDialog(
-                this,"Login Berhasil ", "Konfirmasi Login",javax.swing.JOptionPane.YES_NO_OPTION
-        );
-
-        if (jawab == javax.swing.JOptionPane.YES_OPTION) {
-
+        javax.swing.JOptionPane.showMessageDialog(
+        this, 
+        "Login Berhasil", 
+        "Informasi", 
+        javax.swing.JOptionPane.INFORMATION_MESSAGE
+    );    
             switch (roleDB) {
                 case "admin":
                     new View.AdminDashboard().setVisible(true);
@@ -282,8 +284,7 @@ public class Login extends javax.swing.JFrame {
             }
 
             this.dispose(); 
-        } else {
-        }
+        
 
     } else {
         javax.swing.JOptionPane.showMessageDialog(this, "Login Gagal");

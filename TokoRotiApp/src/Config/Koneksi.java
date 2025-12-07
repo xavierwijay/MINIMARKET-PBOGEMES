@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 public class Koneksi {
     private static Connection mysqlconfig;
+        
     
     public static Connection configDB() throws SQLException {
         try {
