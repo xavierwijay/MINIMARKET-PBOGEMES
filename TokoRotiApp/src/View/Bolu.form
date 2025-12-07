@@ -2146,7 +2146,10 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jPanel25" alignment="0" pref="1041" max="32767" attributes="0"/>
+          <Group type="102" alignment="0" attributes="0">
+              <Component id="jPanel25" min="-2" pref="1045" max="-2" attributes="0"/>
+              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+          </Group>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -2185,7 +2188,7 @@
               </Group>
               <Group type="102" attributes="0">
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="jPanel38" alignment="0" min="-2" max="-2" attributes="0"/>
+                      <Component id="jPanel38" min="-2" max="-2" attributes="0"/>
                       <Component id="jPanel26" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
@@ -2222,7 +2225,9 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="39" max="-2" attributes="0"/>
                       <Component id="jLabel22" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="796" max="32767" attributes="0"/>
+                      <EmptySpace pref="638" max="32767" attributes="0"/>
+                      <Component id="blistpesanan" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="jButton36" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="56" max="-2" attributes="0"/>
                   </Group>
@@ -2236,7 +2241,10 @@
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
-                      <Component id="jButton36" min="-2" pref="30" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="3" attributes="0">
+                          <Component id="jButton36" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
+                          <Component id="blistpesanan" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
+                      </Group>
                       <EmptySpace max="32767" attributes="0"/>
                   </Group>
               </Group>
@@ -2265,6 +2273,23 @@
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton36ActionPerformed"/>
+              </Events>
+            </Component>
+            <Component class="javax.swing.JButton" name="blistpesanan">
+              <Properties>
+                <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                  <Color blue="a1" green="63" red="84" type="rgb"/>
+                </Property>
+                <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                  <Font name="Segoe UI" size="12" style="1"/>
+                </Property>
+                <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+                  <Color blue="ff" green="ff" red="ff" type="rgb"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Keranjang Pemesanan"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="blistpesananActionPerformed"/>
               </Events>
             </Component>
           </SubComponents>
@@ -2355,7 +2380,7 @@
                                           <Group type="102" attributes="0">
                                               <Component id="jLabel91" min="-2" max="-2" attributes="0"/>
                                               <EmptySpace max="-2" attributes="0"/>
-                                              <Component id="jSpinner19" min="-2" max="-2" attributes="0"/>
+                                              <Component id="jBoluKeju" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                           <Component id="jLabel89" alignment="0" min="-2" max="-2" attributes="0"/>
                                       </Group>
@@ -2382,7 +2407,7 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jLabel91" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jSpinner19" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jBoluKeju" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace min="-2" pref="18" max="-2" attributes="0"/>
                           <Component id="jButton35" min="-2" pref="25" max="-2" attributes="0"/>
@@ -2411,7 +2436,7 @@
                     <Property name="text" type="java.lang.String" value="Rp. 20.0000"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JSpinner" name="jSpinner19">
+                <Component class="javax.swing.JSpinner" name="jBoluKeju">
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel91">
                   <Properties>
@@ -2434,6 +2459,9 @@
                     </Property>
                     <Property name="text" type="java.lang.String" value="Tambahkan Pesanan"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton35ActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel92">
                   <Properties>
@@ -2476,7 +2504,7 @@
                                           <Group type="102" attributes="0">
                                               <Component id="jLabel71" min="-2" max="-2" attributes="0"/>
                                               <EmptySpace max="-2" attributes="0"/>
-                                              <Component id="jSpinner14" min="-2" max="-2" attributes="0"/>
+                                              <Component id="jBoluMeses" min="-2" max="-2" attributes="0"/>
                                           </Group>
                                           <Component id="jLabel69" alignment="0" min="-2" max="-2" attributes="0"/>
                                       </Group>
@@ -2502,7 +2530,7 @@
                           <Component id="jLabel70" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
-                              <Component id="jSpinner14" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jBoluMeses" alignment="3" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel71" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -2532,7 +2560,7 @@
                     <Property name="text" type="java.lang.String" value="Rp. 15.0000"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JSpinner" name="jSpinner14">
+                <Component class="javax.swing.JSpinner" name="jBoluMeses">
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel71">
                   <Properties>
@@ -2555,6 +2583,9 @@
                     </Property>
                     <Property name="text" type="java.lang.String" value="Tambahkan Pesanan"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton26ActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel72">
                   <Properties>
@@ -2580,7 +2611,7 @@
                           <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
                           <Component id="jLabel75" min="-2" max="-2" attributes="0"/>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                          <Component id="jSpinner15" min="-2" max="-2" attributes="0"/>
+                          <Component id="jBoluStrw" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="32767" attributes="0"/>
                       </Group>
                       <Group type="102" alignment="0" attributes="0">
@@ -2613,7 +2644,7 @@
                           <Component id="jLabel74" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jSpinner15" min="-2" max="-2" attributes="0"/>
+                              <Component id="jBoluStrw" min="-2" max="-2" attributes="0"/>
                               <Component id="jLabel75" alignment="0" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -2629,7 +2660,7 @@
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Segoe UI" size="14" style="1"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="Bolu Meses Starberry"/>
+                    <Property name="text" type="java.lang.String" value="Bolu Meses Strawberry"/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel74">
@@ -2643,7 +2674,7 @@
                     <Property name="text" type="java.lang.String" value="Rp. 20.0000"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JSpinner" name="jSpinner15">
+                <Component class="javax.swing.JSpinner" name="jBoluStrw">
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel75">
                   <Properties>
@@ -2666,6 +2697,9 @@
                     </Property>
                     <Property name="text" type="java.lang.String" value="Tambahkan Pesanan"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton27ActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel76">
                   <Properties>
@@ -2700,7 +2734,7 @@
                                       <Group type="102" attributes="0">
                                           <Component id="jLabel79" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                                          <Component id="jSpinner16" min="-2" max="-2" attributes="0"/>
+                                          <Component id="jBoluMatcha" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Component id="jLabel78" min="-2" max="-2" attributes="0"/>
                                       <Component id="jLabel77" min="-2" max="-2" attributes="0"/>
@@ -2723,7 +2757,7 @@
                           <EmptySpace max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="3" attributes="0">
                               <Component id="jLabel79" alignment="3" min="-2" max="-2" attributes="0"/>
-                              <Component id="jSpinner16" alignment="3" min="-2" max="-2" attributes="0"/>
+                              <Component id="jBoluMatcha" alignment="3" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="jButton28" min="-2" pref="25" max="-2" attributes="0"/>
@@ -2752,7 +2786,7 @@
                     <Property name="text" type="java.lang.String" value="Rp. 27.0000"/>
                   </Properties>
                 </Component>
-                <Component class="javax.swing.JSpinner" name="jSpinner16">
+                <Component class="javax.swing.JSpinner" name="jBoluMatcha">
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel79">
                   <Properties>
@@ -2775,6 +2809,9 @@
                     </Property>
                     <Property name="text" type="java.lang.String" value="Tambahkan Pesanan"/>
                   </Properties>
+                  <Events>
+                    <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton28ActionPerformed"/>
+                  </Events>
                 </Component>
                 <Component class="javax.swing.JLabel" name="jLabel80">
                   <Properties>
@@ -2856,6 +2893,9 @@
                 </Property>
                 <Property name="text" type="java.lang.String" value="Roti"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton30ActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="jButton31">
               <Properties>

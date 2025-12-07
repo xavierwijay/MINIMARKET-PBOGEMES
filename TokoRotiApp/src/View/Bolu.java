@@ -4,6 +4,10 @@
  */
 package View;
 
+import Controller.KeranjangController;
+import Model.Product;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author LENOVO
@@ -152,13 +156,14 @@ public class Bolu extends javax.swing.JFrame {
         jPanel26 = new javax.swing.JPanel();
         jLabel22 = new javax.swing.JLabel();
         jButton36 = new javax.swing.JButton();
+        blistpesanan = new javax.swing.JButton();
         jLabel23 = new javax.swing.JLabel();
         jLabel24 = new javax.swing.JLabel();
         jPanel38 = new javax.swing.JPanel();
         jPanel33 = new javax.swing.JPanel();
         jLabel89 = new javax.swing.JLabel();
         jLabel90 = new javax.swing.JLabel();
-        jSpinner19 = new javax.swing.JSpinner();
+        jBoluKeju = new javax.swing.JSpinner();
         jLabel91 = new javax.swing.JLabel();
         jButton35 = new javax.swing.JButton();
         jLabel92 = new javax.swing.JLabel();
@@ -166,21 +171,21 @@ public class Bolu extends javax.swing.JFrame {
         jPanel29 = new javax.swing.JPanel();
         jLabel69 = new javax.swing.JLabel();
         jLabel70 = new javax.swing.JLabel();
-        jSpinner14 = new javax.swing.JSpinner();
+        jBoluMeses = new javax.swing.JSpinner();
         jLabel71 = new javax.swing.JLabel();
         jButton26 = new javax.swing.JButton();
         jLabel72 = new javax.swing.JLabel();
         jPanel30 = new javax.swing.JPanel();
         jLabel73 = new javax.swing.JLabel();
         jLabel74 = new javax.swing.JLabel();
-        jSpinner15 = new javax.swing.JSpinner();
+        jBoluStrw = new javax.swing.JSpinner();
         jLabel75 = new javax.swing.JLabel();
         jButton27 = new javax.swing.JButton();
         jLabel76 = new javax.swing.JLabel();
         jPanel31 = new javax.swing.JPanel();
         jLabel77 = new javax.swing.JLabel();
         jLabel78 = new javax.swing.JLabel();
-        jSpinner16 = new javax.swing.JSpinner();
+        jBoluMatcha = new javax.swing.JSpinner();
         jLabel79 = new javax.swing.JLabel();
         jButton28 = new javax.swing.JButton();
         jLabel80 = new javax.swing.JLabel();
@@ -1429,6 +1434,16 @@ public class Bolu extends javax.swing.JFrame {
             }
         });
 
+        blistpesanan.setBackground(new java.awt.Color(132, 99, 161));
+        blistpesanan.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        blistpesanan.setForeground(new java.awt.Color(255, 255, 255));
+        blistpesanan.setText("Keranjang Pemesanan");
+        blistpesanan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                blistpesananActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel26Layout = new javax.swing.GroupLayout(jPanel26);
         jPanel26.setLayout(jPanel26Layout);
         jPanel26Layout.setHorizontalGroup(
@@ -1436,7 +1451,9 @@ public class Bolu extends javax.swing.JFrame {
             .addGroup(jPanel26Layout.createSequentialGroup()
                 .addGap(39, 39, 39)
                 .addComponent(jLabel22)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 796, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 638, Short.MAX_VALUE)
+                .addComponent(blistpesanan)
+                .addGap(18, 18, 18)
                 .addComponent(jButton36)
                 .addGap(56, 56, 56))
         );
@@ -1447,7 +1464,9 @@ public class Bolu extends javax.swing.JFrame {
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(jPanel26Layout.createSequentialGroup()
                 .addGap(22, 22, 22)
-                .addComponent(jButton36, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel26Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton36, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(blistpesanan, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1475,6 +1494,11 @@ public class Bolu extends javax.swing.JFrame {
         jButton35.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jButton35.setForeground(new java.awt.Color(255, 255, 255));
         jButton35.setText("Tambahkan Pesanan");
+        jButton35.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton35ActionPerformed(evt);
+            }
+        });
 
         jLabel92.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/bolu keju.png"))); // NOI18N
 
@@ -1493,7 +1517,7 @@ public class Bolu extends javax.swing.JFrame {
                                 .addGroup(jPanel33Layout.createSequentialGroup()
                                     .addComponent(jLabel91)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jSpinner19, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(jBoluKeju, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addComponent(jLabel89)))
                         .addGroup(jPanel33Layout.createSequentialGroup()
                             .addGap(26, 26, 26)
@@ -1512,7 +1536,7 @@ public class Bolu extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel33Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel91)
-                    .addComponent(jSpinner19, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jBoluKeju, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jButton35, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(16, Short.MAX_VALUE))
@@ -1538,6 +1562,11 @@ public class Bolu extends javax.swing.JFrame {
         jButton26.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jButton26.setForeground(new java.awt.Color(255, 255, 255));
         jButton26.setText("Tambahkan Pesanan");
+        jButton26.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton26ActionPerformed(evt);
+            }
+        });
 
         jLabel72.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/bolumeses.png"))); // NOI18N
         jLabel72.setText("jLabel72");
@@ -1557,7 +1586,7 @@ public class Bolu extends javax.swing.JFrame {
                                 .addGroup(jPanel29Layout.createSequentialGroup()
                                     .addComponent(jLabel71)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jSpinner14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(jBoluMeses, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addComponent(jLabel69)))
                         .addGroup(jPanel29Layout.createSequentialGroup()
                             .addGap(33, 33, 33)
@@ -1575,7 +1604,7 @@ public class Bolu extends javax.swing.JFrame {
                 .addComponent(jLabel70)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel29Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jSpinner14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jBoluMeses, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel71))
                 .addGap(18, 18, 18)
                 .addComponent(jButton26, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1585,7 +1614,7 @@ public class Bolu extends javax.swing.JFrame {
         jPanel30.setBackground(new java.awt.Color(255, 255, 255));
 
         jLabel73.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel73.setText("Bolu Meses Starberry");
+        jLabel73.setText("Bolu Meses Strawberry");
 
         jLabel74.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel74.setForeground(new java.awt.Color(158, 115, 52));
@@ -1598,6 +1627,11 @@ public class Bolu extends javax.swing.JFrame {
         jButton27.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jButton27.setForeground(new java.awt.Color(255, 255, 255));
         jButton27.setText("Tambahkan Pesanan");
+        jButton27.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton27ActionPerformed(evt);
+            }
+        });
 
         jLabel76.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/bolu meses strawberry.png"))); // NOI18N
 
@@ -1609,7 +1643,7 @@ public class Bolu extends javax.swing.JFrame {
                 .addGap(20, 20, 20)
                 .addComponent(jLabel75)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jSpinner15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jBoluStrw, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel30Layout.createSequentialGroup()
                 .addGap(16, 16, 16)
@@ -1636,7 +1670,7 @@ public class Bolu extends javax.swing.JFrame {
                 .addComponent(jLabel74)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel30Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSpinner15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jBoluStrw, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel75))
                 .addGap(18, 18, 18)
                 .addComponent(jButton27, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1659,6 +1693,11 @@ public class Bolu extends javax.swing.JFrame {
         jButton28.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jButton28.setForeground(new java.awt.Color(255, 255, 255));
         jButton28.setText("Tambahkan Pesanan");
+        jButton28.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton28ActionPerformed(evt);
+            }
+        });
 
         jLabel80.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/bolu matcha strawberry.png"))); // NOI18N
 
@@ -1679,7 +1718,7 @@ public class Bolu extends javax.swing.JFrame {
                             .addGroup(jPanel31Layout.createSequentialGroup()
                                 .addComponent(jLabel79)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jSpinner16, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jBoluMatcha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addComponent(jLabel78)
                             .addComponent(jLabel77))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -1696,7 +1735,7 @@ public class Bolu extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel79)
-                    .addComponent(jSpinner16, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jBoluMatcha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jButton28, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -1752,6 +1791,11 @@ public class Bolu extends javax.swing.JFrame {
         jButton30.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jButton30.setForeground(new java.awt.Color(255, 255, 255));
         jButton30.setText("Roti");
+        jButton30.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton30ActionPerformed(evt);
+            }
+        });
 
         jButton31.setBackground(new java.awt.Color(175, 139, 87));
         jButton31.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -1840,7 +1884,9 @@ public class Bolu extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel25, javax.swing.GroupLayout.PREFERRED_SIZE, 1041, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel25, javax.swing.GroupLayout.PREFERRED_SIZE, 1045, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1888,19 +1934,114 @@ public class Bolu extends javax.swing.JFrame {
 
     private void jButton29ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton29ActionPerformed
         // TODO add your handling code here:
+        KueUlangTahun kut = new KueUlangTahun();
+        kut.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_jButton29ActionPerformed
 
     private void jButton31ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton31ActionPerformed
         // TODO add your handling code here:
+        Bolu b = new Bolu();
+        b.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_jButton31ActionPerformed
 
     private void jButton32ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton32ActionPerformed
         // TODO add your handling code here:
+        KueKering kk = new KueKering();
+        kk.setVisible(true);
+        this.dispose();
+           
     }//GEN-LAST:event_jButton32ActionPerformed
 
     private void jButton36ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton36ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton36ActionPerformed
+
+    private void jButton30ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton30ActionPerformed
+        // TODO add your handling code here:
+        Roti r = new Roti();
+        r.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_jButton30ActionPerformed
+
+    private void jButton35ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton35ActionPerformed
+        // TODO add your handling code here:
+        int jumlah = (int) jBoluKeju.getValue();   
+    if (jumlah <= 0) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
+        return;
+    }
+    Product p = new Product(301, "Bolu Keju", 20000.0, 0, "bolu"); // ID & harga sesuaikan
+    KeranjangController.getInstance().tambahItem(p, jumlah);
+
+    javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
+    jBoluKeju.setValue(0); // reset
+    }//GEN-LAST:event_jButton35ActionPerformed
+
+    private void jButton26ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton26ActionPerformed
+        // TODO add your handling code here:
+        int jumlah = (int) jBoluMeses.getValue();   
+    if (jumlah <= 0) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
+        return;
+    }
+    Product p = new Product(302, "Bolu Meses", 15000.0, 0, "bolu"); // ID & harga sesuaikan
+    KeranjangController.getInstance().tambahItem(p, jumlah);
+
+    javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
+    jBoluMeses.setValue(0); // reset
+    }//GEN-LAST:event_jButton26ActionPerformed
+
+    private void jButton27ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton27ActionPerformed
+        // TODO add your handling code here:
+        int jumlah = (int) jBoluStrw.getValue();   
+    if (jumlah <= 0) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
+        return;
+    }
+    Product p = new Product(303, "Bolu Meses Strawberry", 20000.0, 0, "bolu"); // ID & harga sesuaikan
+    KeranjangController.getInstance().tambahItem(p, jumlah);
+
+    javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
+    jBoluStrw.setValue(0); // reset
+    }//GEN-LAST:event_jButton27ActionPerformed
+
+    private void jButton28ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton28ActionPerformed
+        // TODO add your handling code here:
+        int jumlah = (int) jBoluMatcha.getValue();   
+    if (jumlah <= 0) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
+        return;
+    }
+    Product p = new Product(304, "Bolu Matcha", 27000.0, 0, "bolu"); // ID & harga sesuaikan
+    KeranjangController.getInstance().tambahItem(p, jumlah);
+
+    javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
+    jBoluMatcha.setValue(0); // reset
+    }//GEN-LAST:event_jButton28ActionPerformed
+
+    private void blistpesananActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_blistpesananActionPerformed
+        // TODO add your handling code here:
+        if (KeranjangController.getInstance().getItems().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Keranjang masih kosong");
+            return;
+        }
+
+        int jawab = JOptionPane.showConfirmDialog(
+            this,
+            "Buka Keranjang Pemesanan?",
+            "Konfirmasi",
+            JOptionPane.YES_NO_OPTION
+        );
+
+        if (jawab == JOptionPane.YES_OPTION) {
+            View.KeranjangPemesanan k = new View.KeranjangPemesanan();
+            k.setLocationRelativeTo(this);
+            k.setVisible(true);
+            // optional: this.dispose();
+        }
+    }//GEN-LAST:event_blistpesananActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1928,6 +2069,11 @@ public class Bolu extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton blistpesanan;
+    private javax.swing.JSpinner jBoluKeju;
+    private javax.swing.JSpinner jBoluMatcha;
+    private javax.swing.JSpinner jBoluMeses;
+    private javax.swing.JSpinner jBoluStrw;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton10;
     private javax.swing.JButton jButton11;
@@ -2078,10 +2224,6 @@ public class Bolu extends javax.swing.JFrame {
     private javax.swing.JSpinner jSpinner11;
     private javax.swing.JSpinner jSpinner12;
     private javax.swing.JSpinner jSpinner13;
-    private javax.swing.JSpinner jSpinner14;
-    private javax.swing.JSpinner jSpinner15;
-    private javax.swing.JSpinner jSpinner16;
-    private javax.swing.JSpinner jSpinner19;
     private javax.swing.JSpinner jSpinner2;
     private javax.swing.JSpinner jSpinner3;
     private javax.swing.JSpinner jSpinner5;

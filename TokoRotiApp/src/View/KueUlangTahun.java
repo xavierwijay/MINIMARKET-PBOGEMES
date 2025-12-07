@@ -4,6 +4,10 @@
  */
 package View;
 
+import Controller.KeranjangController;
+import Model.Product;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author LENOVO
@@ -39,6 +43,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jButton36 = new javax.swing.JButton();
+        blistpesanan = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
@@ -47,15 +52,15 @@ public class KueUlangTahun extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
-        jSpinner1 = new javax.swing.JSpinner();
+        jKucs = new javax.swing.JSpinner();
         jLabel9 = new javax.swing.JLabel();
-        jButton5 = new javax.swing.JButton();
+        bTambahPesanan = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
-        jSpinner2 = new javax.swing.JSpinner();
+        jKutm = new javax.swing.JSpinner();
         jLabel14 = new javax.swing.JLabel();
         jButton6 = new javax.swing.JButton();
         jLabel13 = new javax.swing.JLabel();
@@ -63,7 +68,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
-        jSpinner3 = new javax.swing.JSpinner();
+        jKutv = new javax.swing.JSpinner();
         jLabel19 = new javax.swing.JLabel();
         jButton7 = new javax.swing.JButton();
         jLabel18 = new javax.swing.JLabel();
@@ -71,7 +76,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
         jLabel20 = new javax.swing.JLabel();
         jLabel21 = new javax.swing.JLabel();
         jLabel22 = new javax.swing.JLabel();
-        jSpinner4 = new javax.swing.JSpinner();
+        jKutb = new javax.swing.JSpinner();
         jLabel24 = new javax.swing.JLabel();
         jButton8 = new javax.swing.JButton();
         jLabel23 = new javax.swing.JLabel();
@@ -115,6 +120,16 @@ public class KueUlangTahun extends javax.swing.JFrame {
             }
         });
 
+        blistpesanan.setBackground(new java.awt.Color(132, 99, 161));
+        blistpesanan.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        blistpesanan.setForeground(new java.awt.Color(255, 255, 255));
+        blistpesanan.setText("Keranjang Pemesanan");
+        blistpesanan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                blistpesananActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -123,6 +138,8 @@ public class KueUlangTahun extends javax.swing.JFrame {
                 .addGap(73, 73, 73)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(blistpesanan)
+                .addGap(18, 18, 18)
                 .addComponent(jButton36)
                 .addGap(44, 44, 44))
         );
@@ -133,7 +150,9 @@ public class KueUlangTahun extends javax.swing.JFrame {
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(26, 26, 26)
-                .addComponent(jButton36, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton36, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(blistpesanan, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -161,10 +180,15 @@ public class KueUlangTahun extends javax.swing.JFrame {
         jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jLabel9.setText("Jumlah");
 
-        jButton5.setBackground(new java.awt.Color(130, 87, 87));
-        jButton5.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton5.setForeground(new java.awt.Color(255, 255, 255));
-        jButton5.setText("Tambahkan Pesanan");
+        bTambahPesanan.setBackground(new java.awt.Color(130, 87, 87));
+        bTambahPesanan.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        bTambahPesanan.setForeground(new java.awt.Color(255, 255, 255));
+        bTambahPesanan.setText("Tambahkan Pesanan");
+        bTambahPesanan.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bTambahPesananActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -185,11 +209,11 @@ public class KueUlangTahun extends javax.swing.JFrame {
                         .addContainerGap()
                         .addComponent(jLabel9)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jKucs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(jButton5)
+                .addComponent(bTambahPesanan)
                 .addGap(33, 33, 33))
         );
         jPanel4Layout.setVerticalGroup(
@@ -206,9 +230,9 @@ public class KueUlangTahun extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel9)
-                    .addComponent(jSpinner1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jKucs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton5)
+                .addComponent(bTambahPesanan)
                 .addContainerGap(12, Short.MAX_VALUE))
         );
 
@@ -234,6 +258,11 @@ public class KueUlangTahun extends javax.swing.JFrame {
         jButton6.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jButton6.setForeground(new java.awt.Color(255, 255, 255));
         jButton6.setText("Tambahkan Pesanan");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
 
         jLabel13.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/matcaha cake.png"))); // NOI18N
         jLabel13.setText("jLabel13");
@@ -253,7 +282,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
                             .addGroup(jPanel6Layout.createSequentialGroup()
                                 .addComponent(jLabel14)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jKutm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel6Layout.createSequentialGroup()
                                 .addGap(8, 8, 8)
                                 .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 176, javax.swing.GroupLayout.PREFERRED_SIZE))))
@@ -276,7 +305,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel14)
-                    .addComponent(jSpinner2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jKutm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton6)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -300,6 +329,11 @@ public class KueUlangTahun extends javax.swing.JFrame {
         jButton7.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jButton7.setForeground(new java.awt.Color(255, 255, 255));
         jButton7.setText("Tambahkan Pesanan");
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton7ActionPerformed(evt);
+            }
+        });
 
         jLabel18.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/vanilla cake.png"))); // NOI18N
         jLabel18.setText("jLabel18");
@@ -323,7 +357,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
                             .addGroup(jPanel7Layout.createSequentialGroup()
                                 .addComponent(jLabel19)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSpinner3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addComponent(jKutv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addGap(14, 14, 14)
                         .addComponent(jLabel18, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -343,7 +377,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel19)
-                    .addComponent(jSpinner3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jKutv, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton7)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -367,6 +401,11 @@ public class KueUlangTahun extends javax.swing.JFrame {
         jButton8.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         jButton8.setForeground(new java.awt.Color(255, 255, 255));
         jButton8.setText("Tambahkan Pesanan");
+        jButton8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton8ActionPerformed(evt);
+            }
+        });
 
         jLabel23.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/buah cake.png"))); // NOI18N
         jLabel23.setText("jLabel23");
@@ -391,7 +430,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
                         .addContainerGap()
                         .addComponent(jLabel24)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSpinner4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jKutb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel8Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addComponent(jLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -411,7 +450,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel24)
-                    .addComponent(jSpinner4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jKutb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton8)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -466,6 +505,11 @@ public class KueUlangTahun extends javax.swing.JFrame {
         jButton2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jButton2.setForeground(new java.awt.Color(255, 255, 255));
         jButton2.setText("Roti");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setBackground(new java.awt.Color(175, 139, 87));
         jButton3.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -567,19 +611,113 @@ public class KueUlangTahun extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+        KueUlangTahun ku = new KueUlangTahun();    
+        ku.setVisible(true);
+    this.dispose(); 
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
+        KueKering kk = new KueKering();
+        kk.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         // TODO add your handling code here:
+        Bolu b = new Bolu();
+        b.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton36ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton36ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton36ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        Roti r = new Roti();    
+        r.setVisible(true);
+    this.dispose(); 
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void bTambahPesananActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bTambahPesananActionPerformed
+        // TODO add your handling code here:
+        int jumlah = (int) jKucs.getValue();   
+    if (jumlah <= 0) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
+        return;
+    }
+    Product p = new Product(101, "Kue Ulang Tahun Coklat Strawberry", 70000.0, 0, "kue"); // ID & harga sesuaikan
+    KeranjangController.getInstance().tambahItem(p, jumlah);
+
+    javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
+    jKucs.setValue(0); // reset
+    }//GEN-LAST:event_bTambahPesananActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        // TODO add your handling code here:
+        int jumlah = (int) jKutm.getValue();   
+    if (jumlah <= 0) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
+        return;
+    }
+    Product p = new Product(102, "Kue Ulang Tahun Matcha", 100000.0, 0, "kue"); // ID & harga sesuaikan
+    KeranjangController.getInstance().tambahItem(p, jumlah);
+
+    javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
+    jKutm.setValue(0); // reset
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+        // TODO add your handling code here:
+         int jumlah = (int) jKutv.getValue();   
+    if (jumlah <= 0) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
+        return;
+    }
+    Product p = new Product(103, "Kue Ulang Tahun Vanila", 90000.0, 0, "kue"); // ID & harga sesuaikan
+    KeranjangController.getInstance().tambahItem(p, jumlah);
+
+    javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
+    jKutv.setValue(0); // reset
+    }//GEN-LAST:event_jButton7ActionPerformed
+
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+        // TODO add your handling code here:
+         int jumlah = (int) jKutb.getValue();   
+    if (jumlah <= 0) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
+        return;
+    }
+    Product p = new Product(104, "Kue Ulang Tahun Buah", 120000.0, 0, "kue"); // ID & harga sesuaikan
+    KeranjangController.getInstance().tambahItem(p, jumlah);
+
+    javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
+    jKutb.setValue(0); // reset
+    }//GEN-LAST:event_jButton8ActionPerformed
+
+    private void blistpesananActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_blistpesananActionPerformed
+        // TODO add your handling code here:
+        if (KeranjangController.getInstance().getItems().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Keranjang masih kosong");
+            return;
+        }
+
+        int jawab = JOptionPane.showConfirmDialog(
+            this,
+            "Buka Keranjang Pemesanan?",
+            "Konfirmasi",
+            JOptionPane.YES_NO_OPTION
+        );
+
+        if (jawab == JOptionPane.YES_OPTION) {
+            View.KeranjangPemesanan k = new View.KeranjangPemesanan();
+            k.setLocationRelativeTo(this);
+            k.setVisible(true);
+            // optional: this.dispose();
+        }
+    }//GEN-LAST:event_blistpesananActionPerformed
 
     /**
      * @param args the command line arguments
@@ -607,16 +745,21 @@ public class KueUlangTahun extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton bTambahPesanan;
+    private javax.swing.JButton blistpesanan;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton36;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem1;
+    private javax.swing.JSpinner jKucs;
+    private javax.swing.JSpinner jKutb;
+    private javax.swing.JSpinner jKutm;
+    private javax.swing.JSpinner jKutv;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -655,9 +798,5 @@ public class KueUlangTahun extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
-    private javax.swing.JSpinner jSpinner1;
-    private javax.swing.JSpinner jSpinner2;
-    private javax.swing.JSpinner jSpinner3;
-    private javax.swing.JSpinner jSpinner4;
     // End of variables declaration//GEN-END:variables
 }

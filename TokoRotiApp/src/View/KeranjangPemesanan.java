@@ -4,7 +4,12 @@
  */
 package View;
 
+import Controller.KeranjangController;
 import java.awt.Image;
+import java.awt.Window;
+import java.text.NumberFormat;
+import java.util.Date;
+import java.util.Locale;
 import javax.swing.ImageIcon;
 
 /**
@@ -14,15 +19,36 @@ import javax.swing.ImageIcon;
 public class KeranjangPemesanan extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(KeranjangPemesanan.class.getName());
-
+    private final NumberFormat rupiah = NumberFormat.getCurrencyInstance(new Locale("id","ID"));
+    private final javax.swing.DefaultListModel<String> pesananModel = new javax.swing.DefaultListModel<>();
+     
     /**
      * Creates new form KeranjangPemesanan
      */
+    
+    
     public KeranjangPemesanan() {
         initComponents();
-        GambarLogo(Logo, "/View/logo besar.png");  
-    }
+        GambarLogo(Logo, "/View/logo besar.png");
+        tbKeranjangPemesanan.setModel(Controller.KeranjangController.getInstance().getTableModel());
+        tbKeranjangPemesanan.setAutoCreateRowSorter(true);
+        tbKeranjangPemesanan.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tbKeranjangPemesanan.setRowSelectionAllowed(true);
+        tbKeranjangPemesanan.setColumnSelectionAllowed(false);
+        jJadwal.setMinSelectableDate(new Date());
 
+        jlPesanan.setModel(pesananModel);
+        txtTotal.setEditable(false);
+        
+        Controller.KeranjangController.getInstance()
+        .getTableModel()
+        .addTableModelListener(e -> refreshTotal());
+        refreshTotal();
+    }
+    
+   
+    
+    
         private void GambarLogo(javax.swing.JLabel label, String resourcePath) {
         ImageIcon imgIco = new ImageIcon(
             getClass().getResource(resourcePath)
@@ -35,7 +61,14 @@ public class KeranjangPemesanan extends javax.swing.JFrame {
         );
 
         label.setIcon(new ImageIcon(image));
+        
     }
+        
+        private void refreshTotal() {
+        double total = KeranjangController.getInstance().getTotal();
+        txtTotal.setText(rupiah.format(total));
+}
+        
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -51,17 +84,20 @@ public class KeranjangPemesanan extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         Logo = new javax.swing.JLabel();
         jScrollPane12 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tbKeranjangPemesanan = new javax.swing.JTable();
         bttnKembali = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
-        jTextField1 = new javax.swing.JTextField();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        jlPesanan = new javax.swing.JList<>();
+        txtTotal = new javax.swing.JTextField();
+        bTambah = new javax.swing.JButton();
+        bHapus = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        jJadwal = new com.toedter.calendar.JDateChooser();
+        txtNamaPembeli = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -72,7 +108,7 @@ public class KeranjangPemesanan extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Stencil", 1, 36)); // NOI18N
         jLabel1.setText("Keranjang pemesanan");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tbKeranjangPemesanan.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -83,7 +119,12 @@ public class KeranjangPemesanan extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane12.setViewportView(jTable1);
+        tbKeranjangPemesanan.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tbKeranjangPemesananMouseClicked(evt);
+            }
+        });
+        jScrollPane12.setViewportView(tbKeranjangPemesanan);
 
         bttnKembali.setBackground(new java.awt.Color(79, 111, 128));
         bttnKembali.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
@@ -111,38 +152,53 @@ public class KeranjangPemesanan extends javax.swing.JFrame {
 
         jLabel2.setFont(new java.awt.Font("Segoe UI Black", 1, 18)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(136, 89, 89));
-        jLabel2.setText("Nama User");
+        jLabel2.setText("Nama Pembeli");
 
         jLabel5.setFont(new java.awt.Font("Segoe UI Black", 1, 18)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(175, 139, 87));
-        jLabel5.setText("Jumlah Pesanan   :");
+        jLabel5.setText("Total Harga           :");
 
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Item 1", "Item 2", "Item 3", "Item 4", "Item 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
+        jlPesanan.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jlPesananMouseClicked(evt);
+            }
         });
-        jScrollPane2.setViewportView(jList1);
+        jlPesanan.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                jlPesananValueChanged(evt);
+            }
+        });
+        jScrollPane2.setViewportView(jlPesanan);
 
-        jButton2.setBackground(new java.awt.Color(150, 125, 183));
-        jButton2.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
-        jButton2.setForeground(new java.awt.Color(255, 255, 255));
-        jButton2.setText("+Tambah");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        txtTotal.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                txtTotalActionPerformed(evt);
             }
         });
 
-        jButton3.setBackground(new java.awt.Color(105, 163, 129));
-        jButton3.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
-        jButton3.setForeground(new java.awt.Color(255, 255, 255));
-        jButton3.setText("Hapus");
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        bTambah.setBackground(new java.awt.Color(150, 125, 183));
+        bTambah.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
+        bTambah.setForeground(new java.awt.Color(255, 255, 255));
+        bTambah.setText("+Tambah");
+        bTambah.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                bTambahActionPerformed(evt);
             }
         });
+
+        bHapus.setBackground(new java.awt.Color(105, 163, 129));
+        bHapus.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
+        bHapus.setForeground(new java.awt.Color(255, 255, 255));
+        bHapus.setText("Hapus");
+        bHapus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bHapusActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI Black", 1, 18)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(175, 139, 87));
+        jLabel6.setText("Tanggal Ambil      :");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -152,24 +208,29 @@ public class KeranjangPemesanan extends javax.swing.JFrame {
                 .addGap(45, 45, 45)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(jButton1)
-                                .addGap(18, 18, 18)
-                                .addComponent(bttnKembali)))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel4)
+                        .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton2)
+                        .addComponent(txtTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(660, 660, 660))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jButton1)
                         .addGap(18, 18, 18)
-                        .addComponent(jButton3)
+                        .addComponent(bttnKembali)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(jLabel6)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jJadwal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(bTambah)
+                        .addGap(18, 18, 18)
+                        .addComponent(bHapus)
                         .addGap(93, 93, 93))))
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -182,9 +243,12 @@ public class KeranjangPemesanan extends javax.swing.JFrame {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(36, 36, 36)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane12, javax.swing.GroupLayout.PREFERRED_SIZE, 892, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(83, Short.MAX_VALUE))
+                            .addComponent(jScrollPane12, javax.swing.GroupLayout.PREFERRED_SIZE, 892, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(txtNamaPembeli, javax.swing.GroupLayout.PREFERRED_SIZE, 146, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -194,21 +258,30 @@ public class KeranjangPemesanan extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(11, 11, 11)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtNamaPembeli, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane12, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(jLabel4)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(bTambah, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(bHapus, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGap(17, 17, 17)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(11, 11, 11)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel5)
+                    .addComponent(txtTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel5)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                    .addComponent(jLabel6)
+                    .addComponent(jJadwal, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(31, 31, 31)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(bttnKembali, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -234,23 +307,95 @@ public class KeranjangPemesanan extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void bttnKembaliActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bttnKembaliActionPerformed
-        // TODO add your handling code here:
-        AdminDashboard ad = new AdminDashboard();
-        ad.setVisible(true);
-        this.dispose();
+        // TODO add your handling code here
+        KueUlangTahun kut = new KueUlangTahun();
+        kut.setVisible(true);
+        this.dispose(); // tutup keranjang
+        
     }//GEN-LAST:event_bttnKembaliActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+        String namaPembeli = txtNamaPembeli.getText().trim();
+        Date tglAmbil = jJadwal.getDate();
+        new View.Rekening(namaPembeli, tglAmbil).setVisible(true);
+
+    if (namaPembeli.isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Nama pembeli wajib diisi.");
+        txtNamaPembeli.requestFocus();
+        return;
+    }
+    if (Controller.KeranjangController.getInstance().getItems().isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Keranjang masih kosong.");
+        return;
+    }
+    if (tglAmbil == null) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Pilih tanggal ambil terlebih dahulu.");
+        jJadwal.requestFocus();
+        return;
+    }
+    try {
+        new View.Rekening(namaPembeli, tglAmbil).setVisible(true);
+        this.dispose();
+    } catch (Throwable ex) {  // jaga-jaga kalau konstruktor tidak cocok, dll.
+        ex.printStackTrace();
+        javax.swing.JOptionPane.showMessageDialog(this,
+            "Gagal membuka halaman pembayaran:\n" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+    }
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void bTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bTambahActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    int viewRow = tbKeranjangPemesanan.getSelectedRow();
+    if (viewRow < 0) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Pilih item di tabel terlebih dahulu.");
+        return;
+    }
+    int modelRow = tbKeranjangPemesanan.convertRowIndexToModel(viewRow);
+    String nama = (String) Controller.KeranjangController
+                    .getInstance().getTableModel().getValueAt(modelRow, 0);
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    if (!pesananModel.contains(nama)) {
+        pesananModel.addElement(nama);
+    }
+    }//GEN-LAST:event_bTambahActionPerformed
+
+    private void bHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bHapusActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton3ActionPerformed
+         int idx = jlPesanan.getSelectedIndex();
+    if (idx >= 0) {
+        pesananModel.remove(idx);
+    } else {
+        javax.swing.JOptionPane.showMessageDialog(this, "Pilih item di daftar pesanan dulu.");
+    }
+    }//GEN-LAST:event_bHapusActionPerformed
+
+    private void tbKeranjangPemesananMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbKeranjangPemesananMouseClicked
+        // TODO add your handling code here:
+        int viewRow = tbKeranjangPemesanan.getSelectedRow();
+        if (viewRow >= 0) {
+        int modelRow = tbKeranjangPemesanan.convertRowIndexToModel(viewRow);
+        String nama = (String) Controller.KeranjangController
+                        .getInstance().getTableModel().getValueAt(modelRow, 0);
+
+        if (!pesananModel.contains(nama)) {
+            pesananModel.addElement(nama);
+        }
+        }
+    }//GEN-LAST:event_tbKeranjangPemesananMouseClicked
+
+    private void txtTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTotalActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtTotalActionPerformed
+
+    private void jlPesananValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jlPesananValueChanged
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_jlPesananValueChanged
+
+    private void jlPesananMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jlPesananMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jlPesananMouseClicked
 
     /**
      * @param args the command line arguments
@@ -279,20 +424,23 @@ public class KeranjangPemesanan extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Logo;
+    private javax.swing.JButton bHapus;
+    private javax.swing.JButton bTambah;
     private javax.swing.JButton bttnKembali;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
+    private com.toedter.calendar.JDateChooser jJadwal;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JList<String> jList1;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane12;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JList<String> jlPesanan;
+    private javax.swing.JTable tbKeranjangPemesanan;
+    private javax.swing.JTextField txtNamaPembeli;
+    private javax.swing.JTextField txtTotal;
     // End of variables declaration//GEN-END:variables
 }
