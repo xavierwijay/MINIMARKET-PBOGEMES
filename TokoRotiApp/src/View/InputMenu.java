@@ -10,6 +10,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import Controller.ProductController;
+import Model.Product;
 
 
 /**
@@ -23,9 +25,37 @@ public class InputMenu extends javax.swing.JFrame {
     /**
      * Creates new form InputMenu
      */
+    Controller.ProductController controller = new Controller.ProductController();
+    
     public InputMenu() {
         initComponents();
         GambarLogo(Logo, "/View/logo besar.png");  
+        
+        loadData();
+    }
+    
+    private void loadData() {
+        // 1. Judul Kolom
+        String[] judul = {"ID", "Nama Roti", "Harga", "Stok", "Kategori"};
+        javax.swing.table.DefaultTableModel model = new javax.swing.table.DefaultTableModel(null, judul);
+        
+        // 2. Ambil data dari Controller
+        // Pastikan 'controller' sudah dideklarasikan di bagian atas class
+        java.util.List<Model.Product> listRoti = controller.ambilSemuaData();
+        
+        // 3. Masukkan ke Tabel
+        for (Model.Product p : listRoti) {
+            Object[] row = new Object[5];
+            row[0] = p.getId();
+            row[1] = p.getName();
+            row[2] = p.getPrice();
+            row[3] = p.getStock();
+            row[4] = p.getCategory();
+            model.addRow(row);
+        }
+        
+        // 4. Set ke GUI
+        tblRoti.setModel(model);
     }
 
         private void GambarLogo(javax.swing.JLabel label, String resourcePath) {
@@ -82,17 +112,17 @@ public class InputMenu extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         Logo = new javax.swing.JLabel();
         jScrollPane12 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tblRoti = new javax.swing.JTable();
         txtNama = new javax.swing.JTextField();
         txtHarga = new javax.swing.JTextField();
-        txtStock = new javax.swing.JTextField();
+        txtStok = new javax.swing.JTextField();
         cbKategori = new javax.swing.JComboBox<>();
-        bttnTambah = new javax.swing.JButton();
-        bttnEdit = new javax.swing.JButton();
-        BttnHapus = new javax.swing.JButton();
+        btnTambah = new javax.swing.JButton();
+        btnEdit = new javax.swing.JButton();
+        btnHapus = new javax.swing.JButton();
         TempatFoto = new javax.swing.JLabel();
-        bttnGambar = new javax.swing.JButton();
-        jButton36 = new javax.swing.JButton();
+        btnGambar = new javax.swing.JButton();
+        btnKeluar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -121,7 +151,7 @@ public class InputMenu extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Stencil", 1, 36)); // NOI18N
         jLabel1.setText("INPUT MENU");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tblRoti.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -132,52 +162,62 @@ public class InputMenu extends javax.swing.JFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
-        jScrollPane12.setViewportView(jTable1);
+        tblRoti.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblRotiMouseClicked(evt);
+            }
+        });
+        jScrollPane12.setViewportView(tblRoti);
 
         cbKategori.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "KUE ULANG TAHUN", "ROTI", "BOLU", "KUE KERING" }));
 
-        bttnTambah.setBackground(new java.awt.Color(150, 125, 183));
-        bttnTambah.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
-        bttnTambah.setForeground(new java.awt.Color(255, 255, 255));
-        bttnTambah.setText("+Tambah");
-        bttnTambah.addActionListener(new java.awt.event.ActionListener() {
+        btnTambah.setBackground(new java.awt.Color(150, 125, 183));
+        btnTambah.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
+        btnTambah.setForeground(new java.awt.Color(255, 255, 255));
+        btnTambah.setText("+Tambah");
+        btnTambah.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bttnTambahActionPerformed(evt);
+                btnTambahActionPerformed(evt);
             }
         });
 
-        bttnEdit.setBackground(new java.awt.Color(183, 93, 93));
-        bttnEdit.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
-        bttnEdit.setForeground(new java.awt.Color(255, 255, 255));
-        bttnEdit.setText("Edit");
-
-        BttnHapus.setBackground(new java.awt.Color(80, 147, 115));
-        BttnHapus.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
-        BttnHapus.setForeground(new java.awt.Color(255, 255, 255));
-        BttnHapus.setText("Hapus");
-        BttnHapus.addActionListener(new java.awt.event.ActionListener() {
+        btnEdit.setBackground(new java.awt.Color(183, 93, 93));
+        btnEdit.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
+        btnEdit.setForeground(new java.awt.Color(255, 255, 255));
+        btnEdit.setText("Edit");
+        btnEdit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BttnHapusActionPerformed(evt);
+                btnEditActionPerformed(evt);
             }
         });
 
-        bttnGambar.setBackground(new java.awt.Color(185, 154, 102));
-        bttnGambar.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
-        bttnGambar.setForeground(new java.awt.Color(255, 255, 255));
-        bttnGambar.setText("Pilih Gambar");
-        bttnGambar.addActionListener(new java.awt.event.ActionListener() {
+        btnHapus.setBackground(new java.awt.Color(80, 147, 115));
+        btnHapus.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
+        btnHapus.setForeground(new java.awt.Color(255, 255, 255));
+        btnHapus.setText("Hapus");
+        btnHapus.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bttnGambarActionPerformed(evt);
+                btnHapusActionPerformed(evt);
             }
         });
 
-        jButton36.setBackground(new java.awt.Color(79, 111, 128));
-        jButton36.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jButton36.setForeground(new java.awt.Color(255, 255, 255));
-        jButton36.setText("Keluar");
-        jButton36.addActionListener(new java.awt.event.ActionListener() {
+        btnGambar.setBackground(new java.awt.Color(185, 154, 102));
+        btnGambar.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
+        btnGambar.setForeground(new java.awt.Color(255, 255, 255));
+        btnGambar.setText("Pilih Gambar");
+        btnGambar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton36ActionPerformed(evt);
+                btnGambarActionPerformed(evt);
+            }
+        });
+
+        btnKeluar.setBackground(new java.awt.Color(79, 111, 128));
+        btnKeluar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnKeluar.setForeground(new java.awt.Color(255, 255, 255));
+        btnKeluar.setText("Keluar");
+        btnKeluar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnKeluarActionPerformed(evt);
             }
         });
 
@@ -191,25 +231,25 @@ public class InputMenu extends javax.swing.JFrame {
                 .addGap(392, 392, 392))
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jButton36)
+                    .addComponent(btnKeluar)
                     .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel2Layout.createSequentialGroup()
                             .addGap(389, 389, 389)
                             .addComponent(jLabel1))
                         .addGroup(jPanel2Layout.createSequentialGroup()
                             .addGap(351, 351, 351)
-                            .addComponent(bttnTambah)
+                            .addComponent(btnTambah)
                             .addGap(29, 29, 29)
-                            .addComponent(bttnEdit)
+                            .addComponent(btnEdit)
                             .addGap(36, 36, 36)
-                            .addComponent(BttnHapus))
+                            .addComponent(btnHapus))
                         .addGroup(jPanel2Layout.createSequentialGroup()
                             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                                     .addContainerGap()
                                     .addComponent(jLabel4)
                                     .addGap(18, 18, 18)
-                                    .addComponent(txtStock, javax.swing.GroupLayout.PREFERRED_SIZE, 223, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(txtStok, javax.swing.GroupLayout.PREFERRED_SIZE, 223, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGroup(jPanel2Layout.createSequentialGroup()
                                     .addGap(66, 66, 66)
                                     .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -224,7 +264,7 @@ public class InputMenu extends javax.swing.JFrame {
                             .addGap(56, 56, 56)
                             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(jLabel5)
-                                .addComponent(bttnGambar, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(btnGambar, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(TempatFoto, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -252,7 +292,7 @@ public class InputMenu extends javax.swing.JFrame {
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGap(24, 24, 24)
-                                .addComponent(bttnGambar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(btnGambar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGap(18, 18, 18)
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -260,20 +300,20 @@ public class InputMenu extends javax.swing.JFrame {
                                     .addComponent(jLabel3))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtStock, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(txtStok, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel4))
                         .addGap(35, 35, 35)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(bttnTambah)
-                            .addComponent(bttnEdit)
-                            .addComponent(BttnHapus)))
+                            .addComponent(btnTambah)
+                            .addComponent(btnEdit)
+                            .addComponent(btnHapus)))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGap(24, 24, 24)
                         .addComponent(TempatFoto, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(28, 28, 28)
                 .addComponent(jScrollPane12, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(27, 27, 27)
-                .addComponent(jButton36, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnKeluar, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(35, Short.MAX_VALUE))
         );
 
@@ -293,7 +333,7 @@ public class InputMenu extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void bttnGambarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bttnGambarActionPerformed
+    private void btnGambarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGambarActionPerformed
         // TODO add your handling code here:
         JFileChooser jc = new JFileChooser(new File(System.getProperty("user.home"), "Pictures"));
     jc.setAcceptAllFileFilterUsed(false);
@@ -319,21 +359,169 @@ public class InputMenu extends javax.swing.JFrame {
         TempatFoto(TempatFoto, fileGambarTerpilih);
 
         // opsional: aktifkan tombol tambah setelah ada gambar
-        bttnTambah.setEnabled(true);
+        btnTambah.setEnabled(true);
     }
-    }//GEN-LAST:event_bttnGambarActionPerformed
+    }//GEN-LAST:event_btnGambarActionPerformed
 
-    private void bttnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bttnTambahActionPerformed
+    private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_bttnTambahActionPerformed
+        try {
+            // 1. Ambil data dari kotak inputan
+            String nama = txtNama.getText();
+            // Konversi teks ke angka (Double/Integer)
+            double harga = Double.parseDouble(txtHarga.getText());
+            int stok = Integer.parseInt(txtStok.getText());
+            String kategori = cbKategori.getSelectedItem().toString();
 
-    private void jButton36ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton36ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton36ActionPerformed
+            // 2. Cek kalau inputan kosong (Opsional tapi bagus)
+            if (nama.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Nama roti tidak boleh kosong!");
+                return;
+            }
 
-    private void BttnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BttnHapusActionPerformed
+            // 3. Masukkan data ke "Wadah" (Model Product)
+            // ID diisi 0 saja karena di database dia Auto Increment
+            Model.Product rotiBaru = new Model.Product(0, nama, harga, stok, kategori);
+            
+            // 4. Panggil Controller untuk simpan ke Database
+            controller.tambahData(rotiBaru);
+            
+            // 5. Refresh Tabel & Bersihkan Inputan
+            loadData(); // <-- Panggil method sakti yang barusan kamu buat
+            txtNama.setText("");
+            txtHarga.setText("");
+            txtStok.setText("");
+            
+            javax.swing.JOptionPane.showMessageDialog(this, "Mantap! Roti berhasil ditambahkan.");
+            
+        } catch (NumberFormatException e) {
+            // Jaga-jaga kalau user ngisi Harga/Stok pakai huruf
+            javax.swing.JOptionPane.showMessageDialog(this, "Harga dan Stok harus angka ya!");
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        }
+        
+    }//GEN-LAST:event_btnTambahActionPerformed
+
+    private void btnKeluarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnKeluarActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_BttnHapusActionPerformed
+        // 1. Buka Jendela Dashboard Admin
+        new View.AdminDashboard().setVisible(true);
+        
+        // 2. Tutup/Hancurkan Jendela InputMenu ini biar gak numpuk
+        this.dispose();
+    }//GEN-LAST:event_btnKeluarActionPerformed
+
+    private void btnHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusActionPerformed
+        // TODO add your handling code here:
+        // 1. Cek apakah user sudah pilih baris di tabel?
+        int baris = tblRoti.getSelectedRow();
+        
+        if (baris == -1) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Pilih dulu roti yang mau dihapus!");
+            return;
+        }
+
+        // 2. Munculkan Pop-up Konfirmasi (Biar gak salah pencet)
+        int konfirmasi = javax.swing.JOptionPane.showConfirmDialog(
+            this, 
+            "Yakin mau menghapus roti ini?", 
+            "Konfirmasi Hapus", 
+            javax.swing.JOptionPane.YES_NO_OPTION
+        );
+
+        // 3. Kalau user pilih YES, baru dieksekusi
+        if (konfirmasi == javax.swing.JOptionPane.YES_OPTION) {
+            try {
+                // Ambil ID dari kolom ke-0
+                String idString = tblRoti.getValueAt(baris, 0).toString();
+                int id = Integer.parseInt(idString);
+                
+                // Panggil Controller untuk hapus
+                controller.hapusData(id);
+                
+                // Refresh Tabel & Bersihkan Form
+                loadData();
+                txtNama.setText("");
+                txtHarga.setText("");
+                txtStok.setText("");
+                
+                javax.swing.JOptionPane.showMessageDialog(this, "Data Berhasil Dihapus!");
+                
+            } catch (Exception e) {
+                System.out.println("Error Hapus: " + e.getMessage());
+            }
+        }
+    }//GEN-LAST:event_btnHapusActionPerformed
+
+    private void tblRotiMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblRotiMouseClicked
+        int baris = tblRoti.getSelectedRow();
+        
+        if (baris != -1) {
+            // Langsung ambil dari tabel dan masukkan ke Text Field
+            txtNama.setText(tblRoti.getValueAt(baris, 1).toString());
+            txtHarga.setText(tblRoti.getValueAt(baris, 2).toString());
+            txtStok.setText(tblRoti.getValueAt(baris, 3).toString());
+            
+            cbKategori.setSelectedItem(tblRoti.getValueAt(baris, 4).toString());
+        }
+    }//GEN-LAST:event_tblRotiMouseClicked
+
+    private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
+        // TODO add your handling code here:
+        // 1. CEK: Apakah user sudah klik salah satu baris di tabel?
+        int baris = tblRoti.getSelectedRow();
+        
+        if (baris == -1) {
+            // Kalau belum pilih, marahin (kasih peringatan)
+            javax.swing.JOptionPane.showMessageDialog(this, "Pilih dulu roti di tabel yang mau diedit!");
+            return;
+        }
+
+        try {
+            // 2. AMBIL ID DARI TABEL (KUNCI UTAMA)
+            // Kita wajib tahu ID roti yang mau diedit. 
+            // Asumsinya ID ada di kolom ke-0 (Paling kiri).
+            String idString = tblRoti.getValueAt(baris, 0).toString();
+            int id = Integer.parseInt(idString);
+            
+            // 3. AMBIL DATA BARU DARI KOTAK INPUT
+            String nama = txtNama.getText();
+            double harga = Double.parseDouble(txtHarga.getText());
+            int stok = Integer.parseInt(txtStok.getText());
+            String kategori = cbKategori.getSelectedItem().toString();
+
+            // Validasi: Jangan biarkan nama kosong
+            if (nama.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Nama roti tidak boleh kosong!");
+                return;
+            }
+
+            // 4. BUNGKUS DATA JADI OBJEK PRODUCT
+            // (ID Lama + Data Baru)
+            Model.Product rotiUpdate = new Model.Product(id, nama, harga, stok, kategori);
+            
+            // 5. SURUH CONTROLLER UPDATE KE DATABASE
+            controller.editData(rotiUpdate);
+            
+            // 6. REFRESH TABEL (Biar perubahan langsung muncul)
+            loadData(); 
+            
+            // 7. BERSIHKAN FORM
+            txtNama.setText("");
+            txtHarga.setText("");
+            txtStok.setText("");
+            
+            // Kasih kabar sukses
+            javax.swing.JOptionPane.showMessageDialog(this, "Data Berhasil Diubah!");
+            
+        } catch (NumberFormatException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Harga dan Stok harus angka!");
+        } catch (Exception e) {
+            System.out.println("Error Edit: " + e.getMessage());
+            e.printStackTrace(); 
+        }
+    }//GEN-LAST:event_btnEditActionPerformed
 
     /**
      * @param args the command line arguments
@@ -361,14 +549,14 @@ public class InputMenu extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton BttnHapus;
     private javax.swing.JLabel Logo;
     private javax.swing.JLabel TempatFoto;
-    private javax.swing.JButton bttnEdit;
-    private javax.swing.JButton bttnGambar;
-    private javax.swing.JButton bttnTambah;
+    private javax.swing.JButton btnEdit;
+    private javax.swing.JButton btnGambar;
+    private javax.swing.JButton btnHapus;
+    private javax.swing.JButton btnKeluar;
+    private javax.swing.JButton btnTambah;
     private javax.swing.JComboBox<String> cbKategori;
-    private javax.swing.JButton jButton36;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -377,9 +565,9 @@ public class InputMenu extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane12;
     private javax.swing.JScrollPane jScrollPane7;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tblRoti;
     private javax.swing.JTextField txtHarga;
     private javax.swing.JTextField txtNama;
-    private javax.swing.JTextField txtStock;
+    private javax.swing.JTextField txtStok;
     // End of variables declaration//GEN-END:variables
 }

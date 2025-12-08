@@ -26,20 +26,28 @@ public class ProductController {
     }
 
     // 2. FITUR EDIT ROTI (UPDATE)
-    public void editData(Product p) {
+    public void editData(Model.Product p) {
+        // Query Update: Ubah nama, harga, stok, kategori BERDASARKAN ID
         String sql = "UPDATE products SET name=?, price=?, stock=?, category=? WHERE product_id=?";
+        
         try {
-            Connection c = Koneksi.configDB();
-            PreparedStatement pst = c.prepareStatement(sql);
+            java.sql.Connection c = Config.Koneksi.configDB();
+            java.sql.PreparedStatement pst = c.prepareStatement(sql);
+            
+            // Masukkan data baru ke tanda tanya (?)
             pst.setString(1, p.getName());
             pst.setDouble(2, p.getPrice());
             pst.setInt(3, p.getStock());
             pst.setString(4, p.getCategory());
-            pst.setInt(5, p.getId()); // ID jadi kunci update
-            pst.execute();
-            System.out.println("Berhasil Edit Data ID: " + p.getId());
+            
+            // PENTING: ID ditaruh di tanda tanya terakhir (WHERE)
+            pst.setInt(5, p.getId());
+            
+            pst.executeUpdate();
+            System.out.println("Berhasil Update ID: " + p.getId());
+            
         } catch (Exception e) {
-            System.err.println("Gagal Edit Data: " + e.getMessage());
+            System.err.println("Gagal Update: " + e.getMessage());
         }
     }
 
