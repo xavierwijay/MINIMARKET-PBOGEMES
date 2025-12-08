@@ -19,38 +19,15 @@ public class UserController {
         }
     }
     
-    public boolean cekLogin(String namaInput, String pw, String role) {
-        User us = new User();
-        us.setUsername(namaInput);   
-        us.setFullname(namaInput);   
-        us.setPassword(pw);
-        us.setRole(role);
-
-        String kolom = "admin".equalsIgnoreCase(role) ? "username" : "fullname";
-        String nilai = "username".equals(kolom) ? us.getUsername() : us.getFullname();
-
-        
-        String sql = "SELECT 1 FROM users WHERE " + kolom + " = '" + esc(nilai) + "' " + "AND password = '" + esc(us.getPassword()) + "' " + "AND role = '" + us.getRole().toLowerCase() + "'";
-
+    public boolean cekLogin(String username, String pw) {
+        String u = esc(username);
+        String p = esc(pw);
+        String sql = "SELECT 1 FROM users " + "WHERE username = '" + u + "' " + "AND password = '" + p + "' " + "AND role = 'customer' " + "LIMIT 1";
         try (Statement stm = conn.createStatement();
-             ResultSet res = stm.executeQuery(sql)) {
-            return res.next();   
+             ResultSet rs = stm.executeQuery(sql)) {
+            return rs.next();
         } catch (SQLException e) {
-            System.out.println("Login gagal: " + e.getMessage());
-            return false;
-        }
-    }
-
-    public boolean buatAkunUser(String username, String fullname, String password) {
-        String sql = "INSERT INTO users (username, password, fullname, role) "
-                   + "VALUES (?, ?, ?, 'customer')";
-        try (PreparedStatement pst = conn.prepareStatement(sql)) {
-            pst.setString(1, username.trim());
-            pst.setString(2, password);          
-            pst.setString(3, fullname.trim());
-            return pst.executeUpdate() == 1;
-        } catch (SQLException e) {
-            System.out.println("Buat akun user gagal: " + e.getMessage());
+            System.out.println("Login gagal (user): " + e.getMessage());
             return false;
         }
     }
@@ -60,11 +37,11 @@ public class UserController {
         try (PreparedStatement pst = conn.prepareStatement(sql)) {
             pst.setString(1, username.trim());
             try (ResultSet rs = pst.executeQuery()) {
-                return rs.next();
+                return rs.next(); // true kalau sudah ada
             }
         } catch (SQLException e) {
             System.out.println("Cek username gagal: " + e.getMessage());
-            return true;
+            return true; // anggap sudah ada supaya aman
         }
     }
 
@@ -78,6 +55,19 @@ public class UserController {
         } catch (SQLException e) {
             System.out.println("Cek fullname gagal: " + e.getMessage());
             return true;
+        }
+    }
+
+    public boolean buatAkunUser(String username, String fullname, String password) {
+        String sql = "INSERT INTO users (username, password, fullname, role) " + "VALUES (?, ?, ?, 'customer')";
+        try (PreparedStatement pst = conn.prepareStatement(sql)) {
+            pst.setString(1, username.trim());
+            pst.setString(2, password);
+            pst.setString(3, fullname.trim());
+            return pst.executeUpdate() == 1;
+        } catch (SQLException e) {
+            System.out.println("Buat akun user gagal: " + e.getMessage());
+            return false;
         }
     }
 

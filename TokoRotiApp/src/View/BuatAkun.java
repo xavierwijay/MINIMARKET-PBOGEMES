@@ -222,33 +222,39 @@ public class BuatAkun extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        String username = txtBnama.getText().trim();             
-        String fullname = txtBnamalengkap.getText().trim();      
-        String password = new String(txtBsandi.getPassword());   
+    String username  = txtBnama.getText().trim().toLowerCase();   // konsisten: username huruf kecil
+    String fullname  = txtBnamalengkap.getText().trim();
+    String password  = new String(txtBsandi.getPassword());
 
-        if (username.isEmpty() || fullname.isEmpty() || password.isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Semua wajib diisi");
+    if (username.isEmpty() || fullname.isEmpty() || password.isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Semua field wajib diisi.");
         return;
-        }
+    
+    }
 
-        UserController uc = new UserController();
-        if (uc.cekUsername(username)) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Username sudah dipakai");
-            return;
-        }
-        if (uc.cekFullname(fullname)) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Nama lengkap sudah dipakai pelanggan lain");
-            return;
-        }
+    Controller.UserController uc = new Controller.UserController();
 
-        boolean ok = uc.buatAkunUser(username, fullname, password);
-        if (ok) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Akun berhasil dibuat. Silakan login.");
-                new View.Login().setVisible(true);
-            this.dispose();
-        } else {
-            javax.swing.JOptionPane.showMessageDialog(this, "Gagal membuat akun. Coba lagi.");
-        }
+    // Cek unik username (untuk semua user)
+    if (uc.cekUsername(username)) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Username sudah dipakai.");
+        return;
+    }
+
+    // Cek unik fullname khusus customer (sesuai implementasi uc.cekFullname)
+    if (uc.cekFullname(fullname)) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Nama lengkap sudah dipakai pelanggan lain.");
+        return;
+    }
+
+    // Simpan akun (role otomatis 'customer' di UserController.buatAkunUser)
+    boolean ok = uc.buatAkunUser(username, fullname, password);
+    if (ok) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Akun berhasil dibuat. Silakan login.");
+        new View.Login().setVisible(true);
+        this.dispose();
+    } else {
+        javax.swing.JOptionPane.showMessageDialog(this, "Gagal membuat akun. Coba lagi.");
+    }
 
     }//GEN-LAST:event_jButton1ActionPerformed
 

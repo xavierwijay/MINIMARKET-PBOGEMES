@@ -18,23 +18,28 @@ public class AdminController {
         }
     }
 
-    public boolean cekLogin(String namaInput, String pw, String role) {
-        Admin adm = new Admin();
-        adm.setUsername(namaInput);
-        adm.setFullname(namaInput);
-        adm.setPassword(pw);
-        adm.setRole(role);
+    
+    private static String esc(String s) {
+        return s == null ? "" : s.replace("'", "''").trim();
+    
+    }
+    
+    public boolean cekLogin(String namaInput, String pw) {
+    String n = esc(namaInput);
+    String p = esc(pw);
 
-    String kolom = "admin".equalsIgnoreCase(role) ? "username" : "fullname";
-    String nilai = "admin".equalsIgnoreCase(role) ? adm.getUsername().trim() : adm.getFullname().trim();
-
-    String sql = "SELECT * FROM users WHERE " + kolom + " = '" + nilai + "' " + "AND password = '" + adm.getPassword() + "' "+ "AND role = '" + adm.getRole().toLowerCase() + "'";
+    // HANYA admin, HANYA lewat fullname
+    String sql = "SELECT 1 FROM users " +
+                 "WHERE fullname = '" + n + "' " +
+                 "AND password = '" + p + "' " +
+                 "AND role = 'admin' " +
+                 "LIMIT 1";
 
     try (java.sql.Statement stm = conn.createStatement();
          java.sql.ResultSet rs = stm.executeQuery(sql)) {
         return rs.next();
-    } catch (SQLException e) {
-        System.out.println("Login gagal: " + e.getMessage());
+    } catch (java.sql.SQLException e) {
+        System.out.println("Login gagal (admin): " + e.getMessage());
         return false;
     }
 }

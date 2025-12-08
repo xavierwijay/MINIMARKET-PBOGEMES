@@ -42,8 +42,6 @@ public class Login extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         txtLNama = new javax.swing.JTextField();
         txtLPassword = new javax.swing.JPasswordField();
-        jLabel7 = new javax.swing.JLabel();
-        cbLRole = new javax.swing.JComboBox<>();
         bttnLogin = new javax.swing.JButton();
         bttnBuatAkun = new javax.swing.JButton();
         jcLPass = new javax.swing.JCheckBox();
@@ -83,17 +81,6 @@ public class Login extends javax.swing.JFrame {
             }
         });
 
-        jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        jLabel7.setText("Peran   :");
-
-        cbLRole.setFont(new java.awt.Font("Segoe UI Historic", 1, 14)); // NOI18N
-        cbLRole.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pelanggan", "Admin", "Kasir" }));
-        cbLRole.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbLRoleActionPerformed(evt);
-            }
-        });
-
         bttnLogin.setBackground(new java.awt.Color(140, 119, 86));
         bttnLogin.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
         bttnLogin.setForeground(new java.awt.Color(255, 255, 255));
@@ -124,24 +111,6 @@ public class Login extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(116, 116, 116)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cbLRole, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(jPanel2Layout.createSequentialGroup()
-                            .addComponent(jLabel7)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jcLPass))
-                        .addComponent(txtLPassword, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 319, Short.MAX_VALUE)
-                        .addComponent(txtLNama, javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(146, 146, 146)
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(280, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -149,7 +118,7 @@ public class Login extends javax.swing.JFrame {
                     .addComponent(bttnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(196, 196, 196))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(81, Short.MAX_VALUE)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel2)
@@ -157,35 +126,42 @@ public class Login extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addGap(79, 79, 79))))
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(149, 149, 149)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jcLPass)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jLabel5)
+                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtLNama, javax.swing.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE)
+                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtLPassword)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(51, 51, 51)
+                .addGap(67, 67, 67)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel3)
-                .addGap(26, 26, 26)
+                .addGap(41, 41, 41)
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txtLNama, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4))
-                .addGap(18, 18, 18)
+                .addGap(17, 17, 17)
                 .addComponent(jLabel5)
-                .addGap(5, 5, 5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtLPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(4, 4, 4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jcLPass)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel7)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cbLRole, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(36, 36, 36)
+                .addGap(56, 56, 56)
                 .addComponent(bttnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(bttnBuatAkun, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(38, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -193,20 +169,18 @@ public class Login extends javax.swing.JFrame {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(22, 22, 22)
+                .addGap(14, 14, 14)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 423, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(84, 84, 84)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 337, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(125, Short.MAX_VALUE))
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -231,62 +205,53 @@ public class Login extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtLPasswordActionPerformed
 
-    private void cbLRoleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbLRoleActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbLRoleActionPerformed
-
     private void bttnBuatAkunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bttnBuatAkunActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_bttnBuatAkunActionPerformed
 
     private void bttnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bttnLoginActionPerformed
         // TODO add your handling code here:
-        String fullname = txtLNama.getText();                     
-        String password = new String(txtLPassword.getPassword()); 
-        String roleUI   = cbLRole.getSelectedItem().toString();  
+        String namaInput = txtLNama.getText().trim();          // untuk Admin = fullname, untuk Kasir/User = username
+    String password  = new String(txtLPassword.getPassword());
 
-    String roleDB;
-    switch (roleUI) {
-        case "Admin":
-            roleDB = "admin";
-            break;
-        case "Kasir":
-            roleDB = "cashier";
-            break;
-        default:
-            roleDB = "customer";
-            break;
+    if (namaInput.isEmpty() || password.isEmpty()) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Nama/Username dan Password wajib diisi.");
+        return;
     }
-        this.dispose();
 
-    AdminController ac = new AdminController();
-    boolean cl = ac.cekLogin(fullname, password, roleDB);
+    Controller.AdminController ac   = new Controller.AdminController();   // admin: fullname+pw
+    Controller.KasirController kc   = new Controller.KasirController();   // kasir: username+pw (role 'cashier')
+    Controller.UserController uc    = new Controller.UserController();    // user : username+pw (role 'customer')
 
-    if (cl) {
-        int jawab = javax.swing.JOptionPane.showConfirmDialog(
-                this,"Login Berhasil ", "Konfirmasi Login",javax.swing.JOptionPane.YES_NO_OPTION
-        );
-
-        if (jawab == javax.swing.JOptionPane.YES_OPTION) {
-
-            switch (roleDB) {
-                case "admin":
-                    new View.AdminDashboard().setVisible(true);
-                    break;
-                case "customer":
-                    new View.Home().setVisible(true);
-                    break;
-                case "cashier":
-                    new View.Transaksi().setVisible(true);
-                    break;
-            }
-
-            this.dispose(); 
-        } else {
+    try {
+        // 1) Admin (fullname + password)
+        if (ac.cekLogin(namaInput, password)) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Login berhasil.");
+            new View.AdminDashboard().setVisible(true);
+            this.dispose();
+            return;
         }
 
-    } else {
-        javax.swing.JOptionPane.showMessageDialog(this, "Login Gagal");
+        // 2) Kasir (username + password, role cashier)
+        if (kc.cekLogin(namaInput, password)) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Login berhasil.");
+            new View.Transaksi().setVisible(true);
+            this.dispose();
+            return;
+        }
+
+        // 3) User (username + password, role customer)
+        if (uc.cekLogin(namaInput, password)) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Login berhasil.");
+            new View.Home().setVisible(true);
+            this.dispose();
+            return;
+        }
+
+        javax.swing.JOptionPane.showMessageDialog(this, "Login gagal");
+    } catch (Exception ex) {
+        ex.printStackTrace();
+        javax.swing.JOptionPane.showMessageDialog(this, "Login gagal" + ex.getMessage());
     }
     }//GEN-LAST:event_bttnLoginActionPerformed
 
@@ -327,14 +292,12 @@ public class Login extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bttnBuatAkun;
     private javax.swing.JButton bttnLogin;
-    private javax.swing.JComboBox<String> cbLRole;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JCheckBox jcLPass;

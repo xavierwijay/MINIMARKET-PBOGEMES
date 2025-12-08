@@ -21,27 +21,23 @@ public class KasirController {
         }
     }
 
-    public boolean cekLogin(String fullname, String pw, String role) {
-        Kasir kr = new Kasir();
-        kr.setFullname(fullname);
-        kr.setPassword(pw);
-        kr.setRole(role);
-
-        boolean status = false;
-
-        String sql = "SELECT * FROM users WHERE "+"fullname ='"+kr.getFullname()+"'"+"AND password ='"+kr.getPassword() + "'"+"AND role ='"+kr.getRole()+"'";
-
-        try {
-            Statement stm = conn.createStatement();
-            ResultSet res = stm.executeQuery(sql);
-
-            status = res.next();        
-        } catch (SQLException e) {
-            System.out.println("Login gagal: " + e.getMessage());
-        }
-
-        return status;
+    private static String esc(String s) {
+        return s == null ? "" : s.replace("'", "''").trim();
     }
 
-    
+    // Kasir login: username + password, role dikunci 'cashier'
+    public boolean cekLogin(String username, String pw) {
+        String u = esc(username);
+        String p = esc(pw);
+
+        String sql = "SELECT 1 FROM users " + "WHERE username = '" + u + "' " + "AND password = '" + p + "' " + "AND role = 'cashier' " + "LIMIT 1";
+
+        try (Statement stm = conn.createStatement();
+             ResultSet rs  = stm.executeQuery(sql)) {
+            return rs.next();
+        } catch (SQLException e) {
+            System.out.println("Login kasir gagal: " + e.getMessage());
+            return false;
+        }
+    }
 }
