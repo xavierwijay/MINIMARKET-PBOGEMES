@@ -1,31 +1,24 @@
 package fafbar.controller;
 
-import fafbar.model.Product;  
-import fafbar.config.DBConnection;  
+import fafbar.model.Product;
+import fafbar.config.DBConnection;
+import java.sql.*;
 import java.util.List;
-import java.util.ArrayList; 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import javax.swing.table.DefaultTableModel; 
+import javax.swing.table.DefaultTableModel;
 
 public class SaleController {
     
     // -------------------------------------------------------------------------
-    // METHOD 1: cariProdukByKodeAtauNama()
+    // METHOD 1: Pencarian Produk (SUDAH DIPERBAIKI NAMA KOLOMNYA)
     // -------------------------------------------------------------------------
-    
-    /**
-     * Mencari produk berdasarkan kode, barcode, atau nama dari database.
-     * @param input Kode produk (barcode) atau Nama Produk.
-     * @return Objek Product jika ditemukan, null jika tidak.
-     */
-        public Product cariProdukByKodeAtauNama(String input) {
-        // FIX KRITIS: Menggunakan tbproduct dan huruf kecil untuk nama kolom di DB
-        String sql = "SELECT id, kode, name, price, stock FROM tbproduct WHERE kode = ? OR name LIKE ?";
+    public Product cariProdukByKodeAtauNama(String input) {
+        // PERBAIKAN: Menggunakan nama kolom sesuai database (Huruf Besar Awal)
+        // Database kamu: ID, Code, Name, Price, Stock
+        String sql = "SELECT ID, Code, Name, Price, Stock FROM tbproduct WHERE Code = ? OR Name LIKE ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -36,127 +29,163 @@ public class SaleController {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     Product p = new Product();
-                    p.setId(rs.getInt("id"));
-                    p.setCode(rs.getString("kode")); // Ambil dari kolom 'kode'
-                    p.setName(rs.getString("name"));
-                    p.setPrice(rs.getDouble("price")); 
-                    p.setStock(rs.getInt("stock"));
-                    // p.setUnit(rs.getString("unit")); // Hapus ini jika Model Product tidak punya setUnit()
+                    // PERBAIKAN: Ambil data sesuai nama kolom di DB (Case Sensitive)
+                    p.setId(rs.getInt("ID"));
+                    p.setCode(rs.getString("Code")); 
+                    p.setName(rs.getString("Name"));
+                    p.setPrice(rs.getDouble("Price")); 
+                    p.setStock(rs.getInt("Stock"));
                     return p;
                 }
             }
         } catch (SQLException e) {
             System.err.println("SQL Error saat mencari produk: " + e.getMessage());
             e.printStackTrace();
-        } catch (Exception e) {
-            System.err.println("Error umum saat mencari produk: " + e.getMessage());
-            e.printStackTrace();
         }
         return null; 
     }
 
-    // ... (Method generateInvoice, saveSale, cetakStruk, dll) ...
-    
-    public String generateInvoice() {
-    String datePart = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
-    
-    // START: Logika untuk mengambil invoice terakhir dari database
-    String lastInvoice = null;
-    String sql = "SELECT invoice_number FROM sales ORDER BY id DESC LIMIT 1";
+    // -------------------------------------------------------------------------
+    // METHOD 2: Simpan Transaksi (SUDAH DIPERBAIKI NAMA KOLOMNYA)
+    // -------------------------------------------------------------------------
+    public boolean saveSale(String invoiceNumber, int userId, double subtotal, 
+                            double discount, double grandTotal, double cash, 
+                            double change, DefaultTableModel tableModel) {
+        
+        Connection conn = null;
+        PreparedStatement psSale = null;
+        PreparedStatement psItem = null;
+        PreparedStatement psUpdateStock = null;
+        PreparedStatement psGetProductId = null; 
 
-    try (Connection conn = DBConnection.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
-        if (rs.next()) {
-            lastInvoice = rs.getString("invoice_number");
-        }
-    } catch (SQLException e) {
-        System.err.println("Gagal ambil invoice terakhir: " + e.getMessage());
-    }
-    // END: Logika untuk mengambil invoice terakhir dari database
-    
-    int newId = 1;
-    
-    if (lastInvoice != null && lastInvoice.length() > 4) {
-        // Asumsi format: INV-YYYYMMDD-XXXX. Ambil XXXX dan tambahkan 1.
+        // Query SQL tetap sama
+        String sqlSale = "INSERT INTO sales (receipt_number, user_id, subtotal, discount_total, total_amount, amount_paid, change_amount, sale_datetime, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), NOW())";
+        String sqlItem = "INSERT INTO sale_items (sale_id, product_id, quantity, price, discount_item, final_price_per_unit, line_total, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
+        String sqlStock = "UPDATE tbproduct SET Stock = Stock - ? WHERE Code = ?";
+        String sqlCariId = "SELECT ID FROM tbproduct WHERE Code = ?";
+
         try {
-            String numPart = lastInvoice.substring(lastInvoice.lastIndexOf("-") + 1);
-            newId = Integer.parseInt(numPart) + 1;
-        } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
-            // Biarkan newId tetap 1 jika parsing gagal
-        }
-    }
-    
-    String formattedId = String.format("%04d", newId); // Format menjadi 0001
-    
-    return "INV-" + datePart + "-" + formattedId;
-}
-    
-    public boolean cetakStruk(String invoiceNumber, String kasirName) {
-        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false); 
 
-            // SIMULASI DATA YANG SEHARUSNYA DIAMBIL DARI DB:
-            String namaToko = "FAFBAR JAYA SHOP"; 
-            String alamatToko = "Jl. Diponegoro No. 123, Salatiga";
+            // A. Simpan Header Sales
+            psSale = conn.prepareStatement(sqlSale, Statement.RETURN_GENERATED_KEYS);
+            psSale.setString(1, invoiceNumber);
+            psSale.setInt(2, userId);
+            psSale.setBigDecimal(3, BigDecimal.valueOf(subtotal));
+            psSale.setBigDecimal(4, BigDecimal.valueOf(discount));
+            psSale.setBigDecimal(5, BigDecimal.valueOf(grandTotal));
+            psSale.setBigDecimal(6, BigDecimal.valueOf(cash));
+            psSale.setBigDecimal(7, BigDecimal.valueOf(change));
+            psSale.executeUpdate();
 
-            // Data Transaksi
-            double total = 75000.00; // HARUS DIAMBIL DARI DB
-            double diskon = 5000.00; // HARUS DIAMBIL DARI DB
-            double grandTotal = total - diskon;
-            double cash = 100000.00; // HARUS DIAMBIL DARI DB
-            double change = cash - grandTotal; // HARUS DIAMBIL DARI DB
-
-            // Simulasi Item Penjualan (HARUS DIAMBIL DARI DB)
-            List<String> items = new ArrayList<>();
-            items.add("Indomie Goreng @ 3.000 x 2 =  6.000");
-            items.add("Belfood Sosis  @ 27.000 x 1 = 27.000");
-            items.add("Fruit Tea 500ml @ 7.000 x 6 =  42.000");
-
-            // --- PROSES PEMBENTUKAN STRUK MEMANJANG ---
-
-            StringBuilder struk = new StringBuilder();
-
-            // Header
-            struk.append("---------------------------------------\n");
-            struk.append(String.format("       %s\n", namaToko));
-            struk.append(String.format("       %s\n", alamatToko));
-            struk.append("---------------------------------------\n");
-
-            // Detail Transaksi
-            struk.append(String.format("Invoice : %s\n", invoiceNumber));
-            struk.append(String.format("Tanggal : %s\n", LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"))));
-            struk.append(String.format("Kasir   : %s\n", kasirName)); // Menggunakan parameter yang dikirim dari SalesFrame
-            struk.append("---------------------------------------\n");
-
-            // Detail Item
-            for (String item : items) {
-                struk.append(String.format("%s\n", item));
+            int saleId = 0;
+            try (ResultSet rs = psSale.getGeneratedKeys()) {
+                if (rs.next()) saleId = rs.getInt(1);
             }
-            struk.append("---------------------------------------\n");
 
-            // Total dan Pembayaran
-            struk.append(String.format("SUB TOTAL: %29.2f\n", total));
-            struk.append(String.format("DISKON  : %29.2f\n", diskon));
-            struk.append(String.format("GRAND TOTAL: %26.2f\n", grandTotal));
-            struk.append("---------------------------------------\n");
-            struk.append(String.format("BAYAR (CASH): %25.2f\n", cash));
-            struk.append(String.format("KEMBALIAN   : %25.2f\n", change));
-            struk.append("---------------------------------------\n");
+            psGetProductId = conn.prepareStatement(sqlCariId);
+            psItem = conn.prepareStatement(sqlItem);
+            psUpdateStock = conn.prepareStatement(sqlStock);
 
-            // Footer
-            struk.append(String.format("    *** Terima Kasih Telah Berbelanja ***\n"));
-            struk.append("\n\n"); 
+            // B. Loop Item (DENGAN PENGECEKAN NULL)
+            for (int i = 0; i < tableModel.getRowCount(); i++) {
+                
+                // PERBAIKAN UTAMA: Cek dulu apakah sel ID Barang (kolom 0) ada isinya
+                Object codeObj = tableModel.getValueAt(i, 0);
+                if (codeObj == null || codeObj.toString().trim().isEmpty()) {
+                    continue; // Jika kosong, lewati baris ini (jangan diproses)
+                }
 
-            // --- SIMULASI PENCETAKAN KE KONSOLE ---
-            System.out.println("\n===== PREVIEW STRUK (FORMAT MENTAH) =====\n");
-            System.out.println(struk.toString());
-            System.out.println("========================================\n");
+                String code = codeObj.toString();
+                
+                // Ambil nilai lain dengan aman (pakai toString() lalu parse)
+                int qty = Integer.parseInt(tableModel.getValueAt(i, 2).toString());
+                double price = Double.parseDouble(tableModel.getValueAt(i, 3).toString());
+                double discItem = Double.parseDouble(tableModel.getValueAt(i, 4).toString());
+                double totalLine = Double.parseDouble(tableModel.getValueAt(i, 5).toString());
 
-            return true; 
+                // Cari ID Produk
+                int productId = 0;
+                psGetProductId.setString(1, code);
+                try (ResultSet rsProd = psGetProductId.executeQuery()) {
+                    if (rsProd.next()) {
+                        productId = rsProd.getInt("ID");
+                    } else {
+                        throw new SQLException("Produk kode " + code + " tidak valid!");
+                    }
+                }
 
-        } catch (Exception e) {
-            System.err.println("Error saat mencetak struk: " + e.getMessage());
-            return false; 
+                // Batch Insert Item
+                psItem.setInt(1, saleId);
+                psItem.setInt(2, productId);
+                psItem.setInt(3, qty);
+                psItem.setBigDecimal(4, BigDecimal.valueOf(price));
+                psItem.setBigDecimal(5, BigDecimal.valueOf(discItem));
+                psItem.setBigDecimal(6, BigDecimal.valueOf(price - discItem));
+                psItem.setBigDecimal(7, BigDecimal.valueOf(totalLine));
+                psItem.addBatch();
+
+                // Batch Update Stok
+                psUpdateStock.setInt(1, qty);
+                psUpdateStock.setString(2, code);
+                psUpdateStock.addBatch();
+            }
+
+            psItem.executeBatch();
+            psUpdateStock.executeBatch();
+
+            conn.commit();
+            return true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            try { if (conn != null) conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            return false;
+        } finally {
+            try {
+                if (psSale != null) psSale.close();
+                if (psItem != null) psItem.close();
+                if (conn != null) { conn.setAutoCommit(true); conn.close(); }
+            } catch (SQLException e) { e.printStackTrace(); }
         }
+    }
+
+    // -------------------------------------------------------------------------
+    // METHOD 3: Generate Invoice
+    // -------------------------------------------------------------------------
+    public String generateInvoice() {
+        String datePart = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String lastInvoice = null;
+        
+        // PERBAIKAN: Sesuaikan dengan nama tabel 'sales' dan kolom 'receipt_number'
+        String sql = "SELECT receipt_number FROM sales ORDER BY id DESC LIMIT 1";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                lastInvoice = rs.getString("receipt_number");
+            }
+        } catch (SQLException e) {
+            System.err.println("Gagal ambil invoice terakhir: " + e.getMessage());
+        }
+        
+        int newId = 1;
+        if (lastInvoice != null && lastInvoice.length() > 4) {
+            try {
+                String numPart = lastInvoice.substring(lastInvoice.lastIndexOf("-") + 1);
+                newId = Integer.parseInt(numPart) + 1;
+            } catch (Exception e) {}
+        }
+        return "INV-" + datePart + "-" + String.format("%04d", newId);
+    }
+    
+    // -------------------------------------------------------------------------
+    // METHOD 4: Cetak Struk (Sederhana)
+    // -------------------------------------------------------------------------
+    public boolean cetakStruk(String invoiceNumber, String kasirName) {
+        System.out.println("mencetak struk: " + invoiceNumber + " oleh " + kasirName);
+        return true; 
     }
 }

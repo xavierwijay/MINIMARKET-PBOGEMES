@@ -41,6 +41,8 @@ public SalesFrame(User kasir) {
     startClock();
 
     model = (DefaultTableModel) table.getModel();
+    
+    model.setRowCount(0);
 
     // Mengunci semua field total agar tidak bisa diedit
     txtTotal.setEditable(false);
@@ -86,11 +88,6 @@ public SalesFrame(User kasir) {
         }
     });
     
-    // Listener tombol CART (jButton2)
-    btnCart.addActionListener(e -> tambahItemDariInput());
-    
-    // Listener untuk field Barcode (saat user tekan Enter)
-    barcode.addActionListener(e -> tambahItemDariInput());
     
     // Listener untuk Diskon dan Cash (saat user tekan Enter)
     discount.addActionListener(e -> hitungGrandTotal());
@@ -792,7 +789,84 @@ private void hitungTotal() {
     }//GEN-LAST:event_txtTotalActionPerformed
 
     private void prosesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prosesActionPerformed
-        
+        // 1. Cek apakah tabel kosong
+        if (model.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "Belum ada barang yang discan!", "Transaksi Kosong", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        // 2. Validasi Pembayaran
+        try {
+            // Ambil data angka dari TextFields
+            // Kita gunakan replace(",", "") jaga-jaga kalau ada format ribuan
+            double totalBelanja = Double.parseDouble(grandTotal.getText().replace(",", ""));
+            double uangBayar = 0;
+            
+            String cashText = cash.getText().trim();
+            if(!cashText.isEmpty()){
+                uangBayar = Double.parseDouble(cashText.replace(",", ""));
+            }
+
+            // Cek apakah uang cukup
+            if (uangBayar < totalBelanja) {
+                JOptionPane.showMessageDialog(this, "Uang pembayaran kurang! \nTotal: " + totalBelanja + "\nBayar: " + uangBayar, "Gagal Bayar", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            // 3. Konfirmasi Transaksi
+            int confirm = JOptionPane.showConfirmDialog(this, "Proses transaksi ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+            if (confirm != JOptionPane.YES_OPTION) {
+                return;
+            }
+
+            // 4. Siapkan Data untuk Controller
+            String noInvoice = invoice.getText();
+            // Ambil user ID yang sedang login (ambil dari object kasir di constructor)
+            // Jika user null (misal testing), pakai ID 1 (admin default)
+            int userId = (kasir != null && kasir.getId() > 0) ? kasir.getId() : 1; 
+            
+            double subtotalVal = Double.parseDouble(txtTotal.getText().replace(",", ""));
+            double discountVal = Double.parseDouble(discount.getText().replace(",", ""));
+            double changeVal = Double.parseDouble(change.getText().replace(",", ""));
+
+            // 5. PANGGIL CONTROLLER (Ini inti OOP-nya)
+            // Kita melempar tanggung jawab penyimpanan data ke Controller (Separation of Concerns)
+            boolean sukses = saleController.saveSale(
+                noInvoice, 
+                userId, 
+                subtotalVal, 
+                discountVal, 
+                totalBelanja, // grandTotal
+                uangBayar, 
+                changeVal, 
+                model // Kirim seluruh data tabel belanjaan
+            );
+
+            // 6. Respon Hasil
+            if (sukses) {
+                // Tanya mau cetak struk?
+                int cetak = JOptionPane.showConfirmDialog(this, "Transaksi Berhasil! \nApakah ingin mencetak struk?", "Sukses", JOptionPane.YES_NO_OPTION);
+                
+                if (cetak == JOptionPane.YES_OPTION) {
+                    // Panggil fungsi cetak di controller
+                    String namaUser = (kasir != null) ? kasir.getFullName() : "Admin";
+                    saleController.cetakStruk(noInvoice, namaUser);
+                }
+                
+                // Reset frame agar siap transaksi baru
+                resetFrame(); 
+                
+            } else {
+                JOptionPane.showMessageDialog(this, "Gagal menyimpan ke database.\nCek koneksi atau stok barang.", "Error Database", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Format angka salah (Total/Cash/Diskon). \nPastikan hanya angka.", "Error Input", JOptionPane.WARNING_MESSAGE);
+            e.printStackTrace();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Terjadi kesalahan: " + e.getMessage(), "System Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
     }//GEN-LAST:event_prosesActionPerformed
 
     private void refreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshActionPerformed

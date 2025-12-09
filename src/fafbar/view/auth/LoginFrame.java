@@ -195,78 +195,94 @@ public class LoginFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void LoginBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoginBtnActionPerformed
-      
+        
     {
             String emailText = email.getText().trim();
-            // Ambil password dari JPasswordField
-            String passwordText = new String(password.getPassword());
+        // Ambil password dari JPasswordField
+        String passwordText = new String(password.getPassword());
 
-            if (emailText.isEmpty() || passwordText.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Email dan password wajib diisi");
-                return;
-            }
+        if (emailText.isEmpty() || passwordText.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Email dan password wajib diisi");
+            return;
+        }
 
-            // Ganti URL, dbUser, dbPass sesuai konfigurasi DB kamu
-            String url = "jdbc:mysql://localhost:3306/fafbar";
-            String dbUser = "root";
-            String dbPass = "";
+        // Ganti URL, dbUser, dbPass sesuai konfigurasi DB kamu
+        String url = "jdbc:mysql://localhost:3306/fafbar";
+        String dbUser = "root";
+        String dbPass = "";
 
-            // Query disesuaikan dengan kolom di DB kamu: id, name, email, role
-            String sql = "SELECT id, username, name, email, role FROM users WHERE email = ? AND password = ?";
+        // Query login
+        String sql = "SELECT id, username, full_name, email, role FROM users WHERE email = ? AND password = ?";
 
-            try {
-                // Pastikan driver MySQL sudah ada di classpath project
-                Class.forName("com.mysql.cj.jdbc.Driver"); 
-                
-                try (Connection con = DriverManager.getConnection(url, dbUser, dbPass);
-                     PreparedStatement ps = con.prepareStatement(sql)) {
+        try {
+            // Pastikan driver MySQL sudah ada di classpath project
+            Class.forName("com.mysql.cj.jdbc.Driver"); 
+            
+            try (java.sql.Connection con = java.sql.DriverManager.getConnection(url, dbUser, dbPass);
+                 java.sql.PreparedStatement ps = con.prepareStatement(sql)) {
 
-                    ps.setString(1, emailText);
-                    ps.setString(2, passwordText);
+                ps.setString(1, emailText);
+                ps.setString(2, passwordText);
 
-                    try (ResultSet rs = ps.executeQuery()) {
-                        if (rs.next()) {
-                            // Ambil data user dari DB
-                            int id = rs.getInt("id");
-                            String username = rs.getString("username"); // Asumsi ada kolom 'username'
-                            String fullName = rs.getString("name");
-                            String role = rs.getString("role");
-                            String emailFromDb = rs.getString("email");
+                try (java.sql.ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        // Ambil data user dari DB
+                        fafbar.model.User user = new fafbar.model.User();
+                        user.setId(rs.getInt("id"));
+                        user.setUsername(rs.getString("username"));
+                        user.setFullName(rs.getString("full_name"));
+                        user.setEmail(rs.getString("email"));
+                        user.setRole(rs.getString("role"));
 
-                            // Buat object User dan set nilainya (menggunakan setter yang sudah diperbaiki)
-                            fafbar.model.User user = new fafbar.model.User();
-                            user.setId(id);
-                            user.setUsername(username); // Mengatur username
-                            user.setFullName(fullName);
-                            user.setEmail(emailFromDb);
-                            user.setRole(role);
+                        // Simpan ke session
+                        fafbar.config.Session.setCurrentUser(user);
 
-                            // Simpan ke session
-                            fafbar.config.Session.setCurrentUser(user);
-
-                            // Pindah ke SalesFrame
-                            // CATATAN: Pastikan SalesFrame memiliki constructor SalesFrame(User user)
-                            fafbar.view.sales.SalesFrame sf = new fafbar.view.sales.SalesFrame(user);
-                            sf.setVisible(true);
-                            sf.pack();
-                            sf.setLocationRelativeTo(null);
-                            this.dispose(); // Tutup window Login saat ini
-                        } else {
-                            JOptionPane.showMessageDialog(this, "Email atau password salah");
-                        }
+                        // Pindah ke SalesFrame
+                        fafbar.view.sales.SalesFrame sf = new fafbar.view.sales.SalesFrame(user);
+                        sf.setVisible(true);
+                        sf.pack();
+                        sf.setLocationRelativeTo(null);
+                        this.dispose(); // Tutup window Login saat ini
+                    } else {
+                        javax.swing.JOptionPane.showMessageDialog(this, "Email atau password salah");
                     }
                 }
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Error koneksi atau database: " + e.getMessage());
-                e.printStackTrace();
             }
+        } catch (Exception e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Error koneksi atau database: " + e.getMessage());
+            e.printStackTrace();
+        }
         
     }//GEN-LAST:event_LoginBtnActionPerformed
   }
     /**
      * @param args the command line arguments
      */
-    
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(LoginFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                // Pastikan posisi di tengah saat dibuka
+                LoginFrame frame = new LoginFrame();
+                frame.setLocationRelativeTo(null); 
+                frame.setVisible(true);
+            }
+        });
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Left;
