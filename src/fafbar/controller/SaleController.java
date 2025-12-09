@@ -12,9 +12,6 @@ import javax.swing.table.DefaultTableModel;
 
 public class SaleController {
     
-    // -------------------------------------------------------------------------
-    // METHOD 1: Pencarian Produk (SUDAH DIPERBAIKI NAMA KOLOMNYA)
-    // -------------------------------------------------------------------------
     public Product cariProdukByKodeAtauNama(String input) {
         // PERBAIKAN: Menggunakan nama kolom sesuai database (Huruf Besar Awal)
         // Database kamu: ID, Code, Name, Price, Stock

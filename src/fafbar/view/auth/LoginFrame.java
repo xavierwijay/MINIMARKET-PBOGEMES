@@ -7,6 +7,8 @@ import javax.swing.JOptionPane;
 import fafbar.config.DBConnection;
 import fafbar.config.Session;
 import fafbar.model.User;
+import fafbar.view.user.UserFrame;   // <-- Tambahkan ini
+import fafbar.view.sales.SalesFrame; // <-- Tambahkan ini
 import java.sql.DriverManager;
 import java.sql.Statement;
 import javax.swing.JFrame;
@@ -27,7 +29,6 @@ public class LoginFrame extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         Right = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
         Left = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -51,31 +52,21 @@ public class LoginFrame extends javax.swing.JFrame {
         jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         jLabel6.setText("FAFBER SHOP");
 
-        jLabel7.setFont(new java.awt.Font("Segoe UI Light", 0, 14)); // NOI18N
-        jLabel7.setForeground(new java.awt.Color(204, 204, 204));
-        jLabel7.setText("copyright © company name All rights reserved");
-
         javax.swing.GroupLayout RightLayout = new javax.swing.GroupLayout(Right);
         Right.setLayout(RightLayout);
         RightLayout.setHorizontalGroup(
             RightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(RightLayout.createSequentialGroup()
-                .addGap(0, 76, Short.MAX_VALUE)
-                .addComponent(jLabel7)
-                .addGap(40, 40, 40))
-            .addGroup(RightLayout.createSequentialGroup()
                 .addGap(111, 111, 111)
                 .addComponent(jLabel6)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(131, Short.MAX_VALUE))
         );
         RightLayout.setVerticalGroup(
             RightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(RightLayout.createSequentialGroup()
                 .addContainerGap(217, Short.MAX_VALUE)
                 .addComponent(jLabel6)
-                .addGap(153, 153, 153)
-                .addComponent(jLabel7)
-                .addGap(78, 78, 78))
+                .addGap(251, 251, 251))
         );
 
         jPanel1.add(Right);
@@ -211,48 +202,66 @@ public class LoginFrame extends javax.swing.JFrame {
         String dbUser = "root";
         String dbPass = "";
 
-        // Query login
+// ... kodingan atasnya tetap ...
+
+       // PERBAIKAN 1: Ambil kolom 'full_name' yang benar
         String sql = "SELECT id, username, full_name, email, role FROM users WHERE email = ? AND password = ?";
 
         try {
-            // Pastikan driver MySQL sudah ada di classpath project
             Class.forName("com.mysql.cj.jdbc.Driver"); 
             
-            try (java.sql.Connection con = java.sql.DriverManager.getConnection(url, dbUser, dbPass);
-                 java.sql.PreparedStatement ps = con.prepareStatement(sql)) {
+            try (Connection con = DriverManager.getConnection(url, dbUser, dbPass);
+                 PreparedStatement ps = con.prepareStatement(sql)) {
 
                 ps.setString(1, emailText);
                 ps.setString(2, passwordText);
 
-                try (java.sql.ResultSet rs = ps.executeQuery()) {
+                try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        // Ambil data user dari DB
-                        fafbar.model.User user = new fafbar.model.User();
-                        user.setId(rs.getInt("id"));
-                        user.setUsername(rs.getString("username"));
-                        user.setFullName(rs.getString("full_name"));
-                        user.setEmail(rs.getString("email"));
-                        user.setRole(rs.getString("role"));
+                        // AMBIL DATA DARI DATABASE
+                        int id = rs.getInt("id");
+                        String username = rs.getString("username");
+                        String fullName = rs.getString("full_name"); // PERBAIKAN 2: Sesuai nama kolom DB
+                        String role = rs.getString("role");
+                        String emailFromDb = rs.getString("email");
 
-                        // Simpan ke session
-                        fafbar.config.Session.setCurrentUser(user);
+                        // BUAT OBJECT USER
+                        User user = new User();
+                        user.setId(id);
+                        user.setUsername(username);
+                        user.setFullName(fullName); 
+                        user.setEmail(emailFromDb);
+                        user.setRole(role);
 
-                        // Pindah ke SalesFrame
-                        fafbar.view.sales.SalesFrame sf = new fafbar.view.sales.SalesFrame(user);
-                        sf.setVisible(true);
-                        sf.pack();
-                        sf.setLocationRelativeTo(null);
-                        this.dispose(); // Tutup window Login saat ini
+                        // SIMPAN KE SESSION
+                        Session.setCurrentUser(user);
+
+                        // --- PERBAIKAN 3: LOGIKA PEMISAHAN ADMIN & KASIR ---
+                        if ("admin".equalsIgnoreCase(role)) {
+                            // JIKA ADMIN -> Masuk ke Menu User (Pengelolaan)
+                            UserFrame adminPage = new UserFrame();
+                            adminPage.setVisible(true);
+                            adminPage.setLocationRelativeTo(null);
+                        } else {
+                            // JIKA KASIR (atau lainnya) -> Masuk ke Menu Penjualan (Pink)
+                            SalesFrame kasirPage = new SalesFrame(user);
+                            kasirPage.setVisible(true);
+                            // Set Maximize biar full screen
+                            kasirPage.setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH); 
+                        }
+
+                        // Tutup Login Frame
+                        this.dispose(); 
+
                     } else {
-                        javax.swing.JOptionPane.showMessageDialog(this, "Email atau password salah");
+                        JOptionPane.showMessageDialog(this, "Email atau password salah");
                     }
                 }
             }
         } catch (Exception e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Error koneksi atau database: " + e.getMessage());
+            JOptionPane.showMessageDialog(this, "Error koneksi atau database: " + e.getMessage());
             e.printStackTrace();
         }
-        
     }//GEN-LAST:event_LoginBtnActionPerformed
   }
     /**
@@ -295,7 +304,6 @@ public class LoginFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPasswordField password;
     // End of variables declaration//GEN-END:variables
