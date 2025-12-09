@@ -370,48 +370,73 @@ public class InputMenu extends javax.swing.JFrame {
     private void btnTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTambahActionPerformed
         // TODO add your handling code here:
         try {
-            String nama = txtNama.getText();
-            double harga = Double.parseDouble(txtHarga.getText());
-            int stok = Integer.parseInt(txtStok.getText());
-            String kategori = cbKategori.getSelectedItem().toString();
-            
-            // --- LOGIKA COPY GAMBAR ---
-            String namaFileGambar = "default.png"; // Default jika tidak pilih gambar
-            
-            if (fileGambarTerpilih != null) {
+        String nama = txtNama.getText();
+        double harga = Double.parseDouble(txtHarga.getText());
+        int stok = Integer.parseInt(txtStok.getText());
+        String kategori = cbKategori.getSelectedItem().toString();
+
+        // --- LOGIKA UPLOAD GAMBAR BARU (COPY KE src/View) ---
+        String pathGambar = "default.png"; // Default kalau tidak pilih gambar
+
+        if (fileGambarTerpilih != null) {
+            try {
                 // 1. Bikin nama unik pakai waktu sekarang (biar tidak bentrok)
-                String ekstensi = fileGambarTerpilih.getName().substring(fileGambarTerpilih.getName().lastIndexOf("."));
-                namaFileGambar = "IMG_" + System.currentTimeMillis() + ekstensi;
+                String namaAsli = fileGambarTerpilih.getName();
+                // Cek ekstensi (jaga-jaga kalau file tidak ada titiknya)
+                String ekstensi = namaAsli.contains(".") ? namaAsli.substring(namaAsli.lastIndexOf(".")) : ".png";
+                String namaFileGambar = "IMG_" + System.currentTimeMillis() + ekstensi;
                 
                 // 2. Tentukan Folder Tujuan: src/View/
-                File folderTujuan = new File("src/View");
-                if (!folderTujuan.exists()) folderTujuan.mkdirs(); // Bikin folder kalau belum ada
+                // "src/View" ini relatif terhadap folder project TokoRotiApp
+                File folderTujuan = new File("src/View"); 
+                if (!folderTujuan.exists()) {
+                    folderTujuan.mkdirs(); // Bikin folder kalau belum ada
+                }
                 
                 // 3. Proses Copy
                 File fileTujuan = new File(folderTujuan, namaFileGambar);
                 Files.copy(fileGambarTerpilih.toPath(), fileTujuan.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                
+                // 4. Update variabel pathGambar untuk disimpan ke Database
+                // Kita simpan Path Absolut dari file yang SUDAH DI-COPY
+                pathGambar = fileTujuan.getAbsolutePath().replace("\\", "/");
+                
+                System.out.println("Sukses copy gambar ke: " + pathGambar);
+
+            } catch (IOException ioEx) {
+                System.err.println("Gagal copy gambar: " + ioEx.getMessage());
+                javax.swing.JOptionPane.showMessageDialog(this, "Gagal meng-upload gambar!");
+                return; // Berhenti jika gagal copy
             }
-            
-            
-            // Masukkan data ke Model (termasuk nama file gambar)
-            Model.Product p = new Model.Product(0, nama, harga, stok, kategori, namaFileGambar);
-            
-            // Kirim ke Controller
-            controller.tambahData(p);
-            
-            // Refresh
-            loadData();
-            bersihkanInput(); // Bikin method kecil untuk kosongkan textfield
-            fileGambarTerpilih = null; // Reset file
-            TempatFoto.setIcon(null); // Reset preview
-            
-            javax.swing.JOptionPane.showMessageDialog(this, "Berhasil simpan menu dengan gambar!");
-            
-        } catch (NumberFormatException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Harga & Stok harus angka!");
-        } catch (Exception e) {
-            System.out.println("Error: " + e.getMessage());
+        } else {
+            // Validasi jika user lupa pilih gambar
+            int confirm = javax.swing.JOptionPane.showConfirmDialog(this, 
+                "Anda belum memilih gambar. Lanjut tanpa gambar?", 
+                "Peringatan", javax.swing.JOptionPane.YES_NO_OPTION);
+            if (confirm == javax.swing.JOptionPane.NO_OPTION) return;
         }
+        // -----------------------------------------------------
+
+        // Simpan ke Database
+        Model.Product rotiBaru = new Model.Product(0, nama, harga, stok, kategori, pathGambar);
+        controller.tambahData(rotiBaru);
+        
+        loadData(); // Refresh tabel
+        
+        // Bersihkan Form
+        txtNama.setText("");
+        txtHarga.setText("");
+        txtStok.setText("");
+        fileGambarTerpilih = null;
+        TempatFoto.setIcon(null);
+        
+        javax.swing.JOptionPane.showMessageDialog(this, "Data Berhasil Ditambahkan!");
+        
+    } catch (NumberFormatException e) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Harga dan Stok harus angka!");
+    } catch (Exception e) {
+        javax.swing.JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+    }
     }
     
     // Method kecil buat bersih-bersih form
