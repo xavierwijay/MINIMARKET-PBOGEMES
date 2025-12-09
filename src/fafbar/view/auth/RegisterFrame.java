@@ -203,72 +203,107 @@ public class RegisterFrame extends javax.swing.JFrame {
 
     private void SignUpBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SignUpBtnActionPerformed
         // Deklarasi variabel
-     String fullName, email, Password;
-     String sql;
-     String SUrl = "jdbc:MySQL://localhost:3306/java_user_database";
-     String SUser = "root";
-     String SPass = "";
+        String fullName, email, password;
+        
+        // 1. Validasi Input Kosong
+        if (fname.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Full Name is required", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        } else if (emailAddress.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Email Address is required", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        } else if (new String(pass.getPassword()).trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Password is required", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
-     // Pemeriksaan input kosong
-     if ("".equals(fname.getText())) {
-         JOptionPane.showMessageDialog(new JFrame(), "Full Name is required", "Error", JOptionPane.ERROR_MESSAGE);
-         return;
-     } else if ("".equals(emailAddress.getText())) {
-         JOptionPane.showMessageDialog(new JFrame(), "Email Address is required", "Error", JOptionPane.ERROR_MESSAGE);
-         return;
-     } else if ("".equals(new String(pass.getPassword()))) { // Lebih aman menggunakan getPassword()
-         JOptionPane.showMessageDialog(new JFrame(), "Password is required", "Error", JOptionPane.ERROR_MESSAGE);
-         return;
-     }
+        // Ambil data dari form
+        fullName = fname.getText();
+        email    = emailAddress.getText();
+        password = new String(pass.getPassword());
 
-     // Mengambil data dari field
-     fullName = fname.getText();
-     email    = emailAddress.getText();
-     Password = new String(pass.getPassword()); // Mengambil password
+        // Kita ambil teks sebelum tanda '@' di email untuk jadi username
+        String username;
+        if (email.contains("@")) {
+            username = email.split("@")[0]; 
+        } else {
+            username = email; // Fallback kalau format email aneh
+        }
 
-     // PERINGATAN: Dalam aplikasi nyata, gunakan HASHING (misalnya BCrypt) untuk password sebelum disimpan!
-     System.out.println("Password (Plain Text): " + Password);
+        // 2. Query SQL UPDATE (Menambahkan kolom username)
+        String sql = "INSERT INTO users (full_name, email, password, username, role, is_active, created_at) VALUES (?, ?, ?, ?, 'cashier', 1, NOW())";
 
-     // SQL menggunakan Prepared Statement (dengan ?)
-     sql = "INSERT INTO user(full_name, email, password) VALUES(?, ?, ?)";
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
 
-     try {
-         // Memuat driver
-         Class.forName("com.mysql.cj.jdbc.Driver");
+            // 3. Eksekusi Query
+            try (java.sql.Connection con = fafbar.config.DBConnection.getConnection();
+                 java.sql.PreparedStatement pst = con.prepareStatement(sql)) {
 
-         // Menggunakan try-with-resources untuk memastikan Connection dan PreparedStatement tertutup
-         try (Connection con = DriverManager.getConnection(SUrl, SUser, SPass);
-              java.sql.PreparedStatement pst = con.prepareStatement(sql)) {
+                pst.setString(1, fullName);
+                pst.setString(2, email);
+                pst.setString(3, password);
+                pst.setString(4, username); // <-- Masukkan username yang sudah digenerate tadi
 
-             // Mengisi nilai ke placeholder (?)
-             pst.setString(1, fullName);
-             pst.setString(2, email);
-             pst.setString(3, Password);
+                pst.executeUpdate();
 
-             // Eksekusi Prepared Statement
-             pst.executeUpdate(); // Gunakan executeUpdate() untuk INSERT
+                // Berhasil
+                JOptionPane.showMessageDialog(this, "New account has been created successfully!\nYour username is: " + username);
+                
+                // Reset field
+                fname.setText("");
+                emailAddress.setText("");
+                pass.setText("");
+                
+                // Opsional: Langsung arahkan ke LoginFrame
+                LoginFrame login = new LoginFrame();
+                login.setVisible(true);
+                login.setLocationRelativeTo(null); 
+                this.dispose();
 
-             // Reset field dan tampilkan pesan sukses
-             fname.setText("");
-             emailAddress.setText("");
-             pass.setText("");
-             showMessageDialog(null, "New account has been created successfully!");
-
-         }
-     } catch (java.sql.SQLIntegrityConstraintViolationException e) {
-         // Menangkap error jika email sudah ada (jika email di set UNIQUE)
-         JOptionPane.showMessageDialog(new JFrame(), "Email already registered.", "Error", JOptionPane.ERROR_MESSAGE);
-         System.out.println("Error! Email already exists: " + e.getMessage());
-     } catch (Exception e) {
-         JOptionPane.showMessageDialog(new JFrame(), "Database Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-         System.out.println("Error! " + e.getMessage());
-     }
+            }
+        } catch (java.sql.SQLIntegrityConstraintViolationException e) {
+            JOptionPane.showMessageDialog(this, "Email or Username already registered.", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace(); 
+        }
     }//GEN-LAST:event_SignUpBtnActionPerformed
 
     /**
      * @param args the command line arguments
      */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(RegisterFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(RegisterFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(RegisterFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(RegisterFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
 
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new RegisterFrame().setVisible(true);
+            }
+        });
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton SignUpBtn;
