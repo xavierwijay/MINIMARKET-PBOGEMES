@@ -18,7 +18,7 @@ public class Home extends javax.swing.JFrame {
     public Home() {
         initComponents();
         setGambar(HomeUi, "/View/roti.png");
-        setGambar(Logo, "/View/logo besar.png");
+        setGambar(Logo, "/View/logo_besar.png");
         
     }
 

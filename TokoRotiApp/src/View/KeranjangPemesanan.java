@@ -29,7 +29,7 @@ public class KeranjangPemesanan extends javax.swing.JFrame {
     
     public KeranjangPemesanan() {
         initComponents();
-        GambarLogo(Logo, "/View/logo besar.png");
+        GambarLogo(Logo, "/View/logo_besar.png");
         tbKeranjangPemesanan.setModel(Controller.KeranjangController.getInstance().getTableModel());
         tbKeranjangPemesanan.setAutoCreateRowSorter(true);
         tbKeranjangPemesanan.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);

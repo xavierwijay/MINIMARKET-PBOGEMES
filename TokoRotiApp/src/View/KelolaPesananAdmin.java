@@ -20,7 +20,7 @@ public class KelolaPesananAdmin extends javax.swing.JFrame {
      */
     public KelolaPesananAdmin() {
         initComponents();
-        GambarLogo(Logo, "/View/logo besar.png");  
+        GambarLogo(Logo, "/View/logo_besar.png");  
     }
 
         private void GambarLogo(javax.swing.JLabel label, String resourcePath) {

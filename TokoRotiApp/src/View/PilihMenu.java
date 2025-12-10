@@ -25,7 +25,7 @@ public class PilihMenu extends javax.swing.JFrame {
      */
     public PilihMenu() throws SQLException {
         initComponents();
-    Gambar(Logo, "/View/logo besar.png");
+    Gambar(Logo, "/View/logo_besar.png");
 
     MakananController uc = new MakananController();
     DefaultTableModel dtm = uc.createTable();

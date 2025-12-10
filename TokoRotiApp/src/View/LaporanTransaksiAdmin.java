@@ -20,7 +20,7 @@ public class LaporanTransaksiAdmin extends javax.swing.JFrame {
      */
     public LaporanTransaksiAdmin() {
         initComponents();
-        GambarLogo(Logo, "/View/logo besar.png");  
+        GambarLogo(Logo, "/View/logo_besar.png");  
     }
 
         private void GambarLogo(javax.swing.JLabel label, String resourcePath) {

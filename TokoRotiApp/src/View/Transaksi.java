@@ -33,7 +33,7 @@ public static Transaksi getInstance(){
     
     public Transaksi() {
         initComponents();
-        Gambar(Logo, "/View/logo besar.png");
+        Gambar(Logo, "/View/logo_besar.png");
         tableTransaksi.setModel(tableTransaksiModel);
 
     tableTransaksiModel.setColumnIdentifiers(
