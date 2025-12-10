@@ -8,6 +8,8 @@ import Controller.MakananController;
 import java.awt.Image;
 import java.sql.SQLException;
 import javax.swing.ImageIcon;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -23,15 +25,25 @@ public class PilihMenu extends javax.swing.JFrame {
      */
     public PilihMenu() throws SQLException {
         initComponents();
-        Gambar(Logo, "/View/logo besar.png");
-        
-        MakananController uc = new MakananController();
-        DefaultTableModel dtm = uc.createTable();
-    
-    //menerapkan default tabel virtual ke tabel select(real)
+    Gambar(Logo, "/View/logo besar.png");
+
+    MakananController uc = new MakananController();
+    DefaultTableModel dtm = uc.createTable();
     this.tableMakan.setModel(dtm);
-    
-    
+
+    // ---- Spinner setup ----
+    spinnerJumlah.setModel(new SpinnerNumberModel(1, 1, 999, 1));
+    ((JSpinner.DefaultEditor) spinnerJumlah.getEditor()).getTextField().setEditable(false);
+
+    // ---- Tambahkan listener DISINI ----
+    spinnerJumlah.addChangeListener(e -> {
+        int v = (int) spinnerJumlah.getValue();
+        if(v < 1){
+            javax.swing.JOptionPane.showMessageDialog(this, "Jumlah minimal 1!");
+            spinnerJumlah.setValue(1);
+        }
+    });
+
     uc.tampilkanMakanan();
     }
     private void Gambar(javax.swing.JLabel label, String resourcePath) {
@@ -70,6 +82,8 @@ public class PilihMenu extends javax.swing.JFrame {
         jButton1 = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         spinnerJumlah = new javax.swing.JSpinner();
+        jLabel6 = new javax.swing.JLabel();
+        lblId = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("PilihMenu");
@@ -131,6 +145,14 @@ public class PilihMenu extends javax.swing.JFrame {
         jLabel5.setForeground(new java.awt.Color(0, 0, 0));
         jLabel5.setText("Jumlah                :");
 
+        jLabel6.setFont(new java.awt.Font("Segoe UI Black", 1, 18)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel6.setText("ID                          :");
+
+        lblId.setFont(new java.awt.Font("Segoe UI Black", 1, 18)); // NOI18N
+        lblId.setForeground(new java.awt.Color(0, 0, 0));
+        lblId.setText("id");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -152,7 +174,8 @@ public class PilihMenu extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(22, 22, 22)
@@ -161,7 +184,8 @@ public class PilihMenu extends javax.swing.JFrame {
                                 .addGap(18, 18, 18)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(spinnerJumlah, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblHarga, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                                    .addComponent(lblHarga, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblId, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE))))))
                 .addContainerGap(454, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -178,6 +202,13 @@ public class PilihMenu extends javax.swing.JFrame {
                     .addComponent(jLabel1)
                     .addComponent(jLabel2))
                 .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel6)
+                        .addGap(22, 22, 22))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(lblId)
+                        .addGap(18, 18, 18)))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblHarga)
                     .addComponent(jLabel4))
@@ -187,7 +218,7 @@ public class PilihMenu extends javax.swing.JFrame {
                     .addComponent(spinnerJumlah, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jButton1)
-                .addGap(84, 84, 84))
+                .addGap(127, 127, 127))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -227,24 +258,70 @@ public class PilihMenu extends javax.swing.JFrame {
         //dgn catatan baris = var pilih, kolom = 0 - 3
         this.jLabel2.setText(dtm2.getValueAt(pilih, 1).toString());
         this.lblHarga.setText(dtm2.getValueAt(pilih, 3).toString());
+        this.lblId.setText(dtm2.getValueAt(pilih, 0).toString());
     }//GEN-LAST:event_tableMakanMouseClicked
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-    int baris = tableMakan.getSelectedRow();
+int id = Integer.parseInt(lblId.getText());
+String nama = jLabel2.getText();
+double harga = Double.parseDouble(lblHarga.getText());
+int jml = Integer.parseInt(spinnerJumlah.getValue().toString());
 
-    String id = tableMakan.getValueAt(baris, 0).toString();
-    String nama = tableMakan.getValueAt(baris, 1).toString();
-    double harga = Double.parseDouble(tableMakan.getValueAt(baris, 3).toString());
+// VALIDASI
+if(jml <= 0){
+    javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus lebih dari 0!");
+    return;   // <-- wajib
+}
 
-    int jumlah = Integer.parseInt(spinnerJumlah.getValue().toString());
+DefaultTableModel model = Transaksi.tableTransaksiModel;
 
-    Transaksi trx = new Transaksi();
-    trx.addToCart(id, nama, jumlah, harga);
-    trx.setVisible(true);
+boolean found = false;
 
-    this.dispose(); // menutup halaman pilih
+for (int i = 0; i < model.getRowCount(); i++) {
+
+    int idExisting = Integer.parseInt(model.getValueAt(i, 0).toString());
+
+    if (idExisting == id) {
+
+        int jumlahExisting = Integer.parseInt(model.getValueAt(i, 2).toString());
+        
+        int jumlahBaru = jumlahExisting + jml;
+
+        model.setValueAt(jumlahBaru, i, 2);
+
+        // update total kolom 4
+        double subtotal = jumlahBaru * harga;
+        model.setValueAt(subtotal, i, 4);
+
+        found = true;
+        break;
+    }
+}
+
+if (!found) {
+
+    double subtotal = harga * jml;
+
+    Object[] row = {
+        id,
+        nama,
+        jml,
+        harga,
+        subtotal
+    };
+
+    model.addRow(row);
+}
+
+// **JANGAN bikin Transaksi baru**
+this.setVisible(false);
+
+// update total di instance yang sudah ada
+Transaksi.getInstance().hitungTotal();
+Transaksi.getInstance().setVisible(true);
+
     }//GEN-LAST:event_jButton1ActionPerformed
-
+    
     /**
      * @param args the command line arguments
      */
@@ -278,9 +355,11 @@ public class PilihMenu extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JLabel lblHarga;
+    private javax.swing.JLabel lblId;
     private javax.swing.JSpinner spinnerJumlah;
     private javax.swing.JTable tableMakan;
     // End of variables declaration//GEN-END:variables
