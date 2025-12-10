@@ -4,10 +4,12 @@ package fafbar.view.user;
 import fafbar.repository.UserRepository;
 import fafbar.view.report.ReportFrame;
 import fafbar.model.User;
+import fafbar.view.auth.LoginFrame;
 import fafbar.view.category.CategoryFrame;
 import fafbar.view.product.ProductFrame;
 import fafbar.view.sales.SalesFrame;
 import java.util.List;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class UserFrame extends javax.swing.JFrame {
@@ -70,14 +72,6 @@ public class UserFrame extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        sidebar = new javax.swing.JPanel();
-        btnUser = new javax.swing.JButton();
-        btnSales = new javax.swing.JButton();
-        btnReport = new javax.swing.JButton();
-        btnCategory = new javax.swing.JButton();
-        btnProduct = new javax.swing.JButton();
-        jLabel10 = new javax.swing.JLabel();
-        btnLogout5 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -86,92 +80,18 @@ public class UserFrame extends javax.swing.JFrame {
         jTable3 = new javax.swing.JTable();
         jScrollPane4 = new javax.swing.JScrollPane();
         jTable4 = new javax.swing.JTable();
+        sidebar3 = new javax.swing.JPanel();
+        btnUser3 = new javax.swing.JButton();
+        btnSales3 = new javax.swing.JButton();
+        btnReport3 = new javax.swing.JButton();
+        btnCategory3 = new javax.swing.JButton();
+        btnProduct3 = new javax.swing.JButton();
+        jLabel13 = new javax.swing.JLabel();
+        btnLogout8 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(255, 204, 204));
-
-        sidebar.setBackground(new java.awt.Color(255, 153, 153));
-
-        btnUser.setText("USER");
-        btnUser.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnUserActionPerformed(evt);
-            }
-        });
-
-        btnSales.setText("SALES");
-        btnSales.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSalesActionPerformed(evt);
-            }
-        });
-
-        btnReport.setText("REPORT");
-        btnReport.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnReportActionPerformed(evt);
-            }
-        });
-
-        btnCategory.setBackground(new java.awt.Color(255, 102, 102));
-        btnCategory.setText("CATEGORY");
-        btnCategory.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCategoryActionPerformed(evt);
-            }
-        });
-
-        btnProduct.setText("PRODUCT");
-        btnProduct.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnProductActionPerformed(evt);
-            }
-        });
-
-        jLabel10.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
-        jLabel10.setText("FAFBAR");
-
-        btnLogout5.setText("LOGOUT");
-
-        javax.swing.GroupLayout sidebarLayout = new javax.swing.GroupLayout(sidebar);
-        sidebar.setLayout(sidebarLayout);
-        sidebarLayout.setHorizontalGroup(
-            sidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(sidebarLayout.createSequentialGroup()
-                .addGap(47, 47, 47)
-                .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sidebarLayout.createSequentialGroup()
-                .addContainerGap(40, Short.MAX_VALUE)
-                .addGroup(sidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnReport, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnUser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnSales, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnCategory, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnProduct, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnLogout5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(40, 40, 40))
-        );
-        sidebarLayout.setVerticalGroup(
-            sidebarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sidebarLayout.createSequentialGroup()
-                .addGap(28, 28, 28)
-                .addComponent(jLabel10)
-                .addGap(45, 45, 45)
-                .addComponent(btnUser)
-                .addGap(18, 18, 18)
-                .addComponent(btnSales)
-                .addGap(18, 18, 18)
-                .addComponent(btnReport)
-                .addGap(18, 18, 18)
-                .addComponent(btnCategory)
-                .addGap(18, 18, 18)
-                .addComponent(btnProduct)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 403, Short.MAX_VALUE)
-                .addComponent(btnLogout5)
-                .addGap(43, 43, 43))
-        );
 
         jPanel3.setBackground(new java.awt.Color(255, 153, 153));
 
@@ -189,7 +109,7 @@ public class UserFrame extends javax.swing.JFrame {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1)
                     .addComponent(jLabel2))
-                .addContainerGap(334, Short.MAX_VALUE))
+                .addContainerGap(321, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -247,13 +167,118 @@ public class UserFrame extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Admins", jScrollPane4);
 
+        sidebar3.setBackground(new java.awt.Color(255, 204, 204));
+
+        btnUser3.setBackground(new java.awt.Color(255, 153, 153));
+        btnUser3.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnUser3.setText("USER");
+        btnUser3.setBorder(null);
+        btnUser3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnUser3ActionPerformed(evt);
+            }
+        });
+
+        btnSales3.setBackground(new java.awt.Color(255, 204, 204));
+        btnSales3.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnSales3.setText("SALES");
+        btnSales3.setBorder(null);
+        btnSales3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSales3ActionPerformed(evt);
+            }
+        });
+
+        btnReport3.setBackground(new java.awt.Color(255, 204, 204));
+        btnReport3.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnReport3.setText("REPORT");
+        btnReport3.setBorder(null);
+        btnReport3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReport3ActionPerformed(evt);
+            }
+        });
+
+        btnCategory3.setBackground(new java.awt.Color(255, 204, 204));
+        btnCategory3.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnCategory3.setText("CATEGORY");
+        btnCategory3.setBorder(null);
+        btnCategory3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCategory3ActionPerformed(evt);
+            }
+        });
+
+        btnProduct3.setBackground(new java.awt.Color(255, 204, 204));
+        btnProduct3.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnProduct3.setText("PRODUCT");
+        btnProduct3.setBorder(null);
+        btnProduct3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnProduct3ActionPerformed(evt);
+            }
+        });
+
+        jLabel13.setFont(new java.awt.Font("Segoe UI", 2, 24)); // NOI18N
+        jLabel13.setText("FAFBAR");
+
+        btnLogout8.setBackground(new java.awt.Color(255, 204, 204));
+        btnLogout8.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnLogout8.setText("LOGOUT");
+        btnLogout8.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLogout8ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout sidebar3Layout = new javax.swing.GroupLayout(sidebar3);
+        sidebar3.setLayout(sidebar3Layout);
+        sidebar3Layout.setHorizontalGroup(
+            sidebar3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(sidebar3Layout.createSequentialGroup()
+                .addGap(47, 47, 47)
+                .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sidebar3Layout.createSequentialGroup()
+                .addContainerGap(40, Short.MAX_VALUE)
+                .addGroup(sidebar3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnLogout8, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(sidebar3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(btnProduct3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnReport3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnUser3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnSales3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnCategory3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addGap(40, 40, 40))
+        );
+        sidebar3Layout.setVerticalGroup(
+            sidebar3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, sidebar3Layout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addComponent(jLabel13)
+                .addGap(45, 45, 45)
+                .addComponent(btnUser3, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(28, 28, 28)
+                .addComponent(btnSales3, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(28, 28, 28)
+                .addComponent(btnReport3, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(28, 28, 28)
+                .addComponent(btnCategory3, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(28, 28, 28)
+                .addComponent(btnProduct3, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 309, Short.MAX_VALUE)
+                .addComponent(btnLogout8)
+                .addContainerGap())
+        );
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(sidebar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, 0)
+                .addContainerGap()
+                .addComponent(sidebar3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(1, 1, 1)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jTabbedPane1)))
@@ -261,13 +286,12 @@ public class UserFrame extends javax.swing.JFrame {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
-                        .addGap(82, 82, 82))
-                    .addComponent(sidebar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 563, Short.MAX_VALUE)
+                .addGap(88, 88, 88))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(sidebar3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -285,40 +309,66 @@ public class UserFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProductActionPerformed
-        ProductFrame productFrame = new ProductFrame();
-        productFrame.setVisible(true);
-
-        this.dispose();
-    }//GEN-LAST:event_btnProductActionPerformed
-
-    private void btnCategoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCategoryActionPerformed
-        CategoryFrame categoryFrame = new CategoryFrame();
-        categoryFrame.setVisible(true);
-
-        this.dispose();
-    }//GEN-LAST:event_btnCategoryActionPerformed
-
-    private void btnReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReportActionPerformed
-        ReportFrame reportFrame = new ReportFrame();
-        reportFrame.setVisible(true);
-        
-        this.dispose();
-    }//GEN-LAST:event_btnReportActionPerformed
-
-    private void btnSalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalesActionPerformed
-        SalesFrame salesFrame = new SalesFrame();
-        salesFrame.setVisible(true);
-        
-        this.dispose();
-    }//GEN-LAST:event_btnSalesActionPerformed
-
-    private void btnUserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUserActionPerformed
+    private void btnUser3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUser3ActionPerformed
         UserFrame userFrame = new UserFrame();
         userFrame.setVisible(true);
 
         this.dispose();
-    }//GEN-LAST:event_btnUserActionPerformed
+    }//GEN-LAST:event_btnUser3ActionPerformed
+
+    private void btnSales3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSales3ActionPerformed
+        SalesFrame salesFrame = new SalesFrame();
+        salesFrame.setVisible(true);
+
+        this.dispose();
+    }//GEN-LAST:event_btnSales3ActionPerformed
+
+    private void btnReport3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReport3ActionPerformed
+        ReportFrame reportFrame = new ReportFrame();
+        reportFrame.setVisible(true);
+
+        this.dispose();
+    }//GEN-LAST:event_btnReport3ActionPerformed
+
+    private void btnCategory3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCategory3ActionPerformed
+        CategoryFrame categoryFrame = new CategoryFrame();
+        categoryFrame.setVisible(true);
+
+        this.dispose();
+    }//GEN-LAST:event_btnCategory3ActionPerformed
+
+    private void btnProduct3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProduct3ActionPerformed
+        ProductFrame productFrame = new ProductFrame();
+        productFrame.setVisible(true);
+
+        this.dispose();
+    }//GEN-LAST:event_btnProduct3ActionPerformed
+
+    private void btnLogout8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLogout8ActionPerformed
+        // 1. Konfirmasi Logout
+        int konfirmasi = JOptionPane.showConfirmDialog(
+            this,
+            "Apakah Anda yakin ingin Logout?",
+            "Konfirmasi Logout",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
+        );
+
+        // 2. Jika user memilih YES
+        if (konfirmasi == JOptionPane.YES_OPTION) {
+            //
+
+            // Asumsi: Anda memiliki frame Login bernama LoginFrame
+            // Ganti 'LoginFrame' sesuai nama frame Login Anda
+
+            // 3. Tampilkan frame Login
+            // Import dulu fafbar.view.Login.LoginFrame
+            new LoginFrame().setVisible(true);
+
+            // 4. Tutup frame SalesFrame saat ini
+            this.dispose();
+        }
+    }//GEN-LAST:event_btnLogout8ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -347,13 +397,34 @@ public class UserFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCategory;
+    private javax.swing.JButton btnCategory1;
+    private javax.swing.JButton btnCategory2;
+    private javax.swing.JButton btnCategory3;
     private javax.swing.JButton btnLogout5;
+    private javax.swing.JButton btnLogout6;
+    private javax.swing.JButton btnLogout7;
+    private javax.swing.JButton btnLogout8;
     private javax.swing.JButton btnProduct;
+    private javax.swing.JButton btnProduct1;
+    private javax.swing.JButton btnProduct2;
+    private javax.swing.JButton btnProduct3;
     private javax.swing.JButton btnReport;
+    private javax.swing.JButton btnReport1;
+    private javax.swing.JButton btnReport2;
+    private javax.swing.JButton btnReport3;
     private javax.swing.JButton btnSales;
+    private javax.swing.JButton btnSales1;
+    private javax.swing.JButton btnSales2;
+    private javax.swing.JButton btnSales3;
     private javax.swing.JButton btnUser;
+    private javax.swing.JButton btnUser1;
+    private javax.swing.JButton btnUser2;
+    private javax.swing.JButton btnUser3;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
@@ -363,5 +434,8 @@ public class UserFrame extends javax.swing.JFrame {
     private javax.swing.JTable jTable3;
     private javax.swing.JTable jTable4;
     private javax.swing.JPanel sidebar;
+    private javax.swing.JPanel sidebar1;
+    private javax.swing.JPanel sidebar2;
+    private javax.swing.JPanel sidebar3;
     // End of variables declaration//GEN-END:variables
 }

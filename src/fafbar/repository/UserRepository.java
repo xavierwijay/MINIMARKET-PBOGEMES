@@ -18,8 +18,8 @@ public class UserRepository {
         user.setId(rs.getInt("id"));
         user.setUsername(rs.getString("username"));
         user.setPassword(rs.getString("password"));
-        // FIX: Menggunakan kolom "name" dari database, bukan "full_name"
-        user.setFullName(rs.getString("name"));
+        // FIX: MENGGUNAKAN KOLOM "full_name" DARI DATABASE
+        user.setFullName(rs.getString("full_name")); 
         user.setRole(rs.getString("role"));
         user.setEmail(rs.getString("email"));
         user.setIsActive(rs.getBoolean("is_active"));
@@ -30,15 +30,15 @@ public class UserRepository {
 
 
     // ============================
-    // GET ALL USERS
+    // GET ALL USERS (Query diubah)
     // ============================
     public List<User> getAllUsers() {
         List<User> userList = new ArrayList<>();
 
         String sql = """
-                SELECT id, username, password, name, role, email, is_active, created_at 
-                FROM USERS
-                """;
+                 SELECT id, username, password, full_name, role, email, is_active, created_at 
+                 FROM USERS
+                 """; // PERUBAHAN: name menjadi full_name
 
         try (Connection conn = DBConnection.getConnection();
              Statement stmt = conn.createStatement();
@@ -57,16 +57,16 @@ public class UserRepository {
 
 
     // ============================
-    // GET USERS BY ROLE
+    // GET USERS BY ROLE (Query diubah)
     // ============================
     public List<User> getUsersByRole(String role) {
         List<User> userList = new ArrayList<>();
 
         String sql = """
-                SELECT id, username, password, name, role, email, is_active, created_at
-                FROM USERS
-                WHERE role = ?
-                """;
+                 SELECT id, username, password, full_name, role, email, is_active, created_at
+                 FROM USERS
+                 WHERE role = ?
+                 """; // PERUBAHAN: name menjadi full_name
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

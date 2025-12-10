@@ -289,7 +289,7 @@ public class ReportFrame extends javax.swing.JFrame {
             }
         });
 
-        btnReport.setBackground(new java.awt.Color(255, 204, 204));
+        btnReport.setBackground(new java.awt.Color(255, 153, 153));
         btnReport.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnReport.setText("REPORT");
         btnReport.setBorder(null);
@@ -299,7 +299,7 @@ public class ReportFrame extends javax.swing.JFrame {
             }
         });
 
-        btnCategory.setBackground(new java.awt.Color(255, 153, 153));
+        btnCategory.setBackground(new java.awt.Color(255, 204, 204));
         btnCategory.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnCategory.setText("CATEGORY");
         btnCategory.setBorder(null);

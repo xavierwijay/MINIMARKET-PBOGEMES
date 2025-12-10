@@ -227,7 +227,7 @@ public class ProductFrame extends javax.swing.JFrame {
             }
         });
 
-        btnCategory2.setBackground(new java.awt.Color(255, 153, 153));
+        btnCategory2.setBackground(new java.awt.Color(255, 204, 204));
         btnCategory2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnCategory2.setText("CATEGORY");
         btnCategory2.setBorder(null);
@@ -237,7 +237,7 @@ public class ProductFrame extends javax.swing.JFrame {
             }
         });
 
-        btnProduct2.setBackground(new java.awt.Color(255, 204, 204));
+        btnProduct2.setBackground(new java.awt.Color(255, 153, 153));
         btnProduct2.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         btnProduct2.setText("PRODUCT");
         btnProduct2.setBorder(null);
@@ -530,36 +530,20 @@ public class ProductFrame extends javax.swing.JFrame {
     private javax.swing.JButton ButtonUpdate;
     private javax.swing.JTable TableProduct;
     private javax.swing.JTextField TextSearch;
-    private javax.swing.JButton btnCategory;
-    private javax.swing.JButton btnCategory1;
     private javax.swing.JButton btnCategory2;
-    private javax.swing.JButton btnLogout5;
-    private javax.swing.JButton btnLogout6;
     private javax.swing.JButton btnLogout7;
-    private javax.swing.JButton btnProduct;
-    private javax.swing.JButton btnProduct1;
     private javax.swing.JButton btnProduct2;
-    private javax.swing.JButton btnReport;
-    private javax.swing.JButton btnReport1;
     private javax.swing.JButton btnReport2;
-    private javax.swing.JButton btnSales;
-    private javax.swing.JButton btnSales1;
     private javax.swing.JButton btnSales2;
     private javax.swing.JButton btnSearchCategory;
-    private javax.swing.JButton btnUser;
-    private javax.swing.JButton btnUser1;
     private javax.swing.JButton btnUser2;
     private javax.swing.JComboBox<String> cmbCategoryID;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JPanel sidebar;
-    private javax.swing.JPanel sidebar1;
     private javax.swing.JPanel sidebar2;
     // End of variables declaration//GEN-END:variables
 
