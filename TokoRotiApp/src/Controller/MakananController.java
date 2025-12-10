@@ -2,6 +2,8 @@
 package Controller;
 
 import Config.Koneksi;
+import Model.Makanan;
+import View.PilihMenu;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,7 +32,36 @@ public class MakananController {
             return this.dtm;
         }
         
-        //method 2
+public boolean updateStock(int id, int jumlah) throws SQLException {
+
+    // Ambil stok dari DB
+    String sqlGet = "SELECT stock FROM tbmakanan WHERE product_id = " + id;
+    ResultSet rs = this.stm.executeQuery(sqlGet);
+
+    int stokSekarang = 0;
+    if (rs.next()) {
+        stokSekarang = rs.getInt("stock");
+    }
+
+    // Validasi stok
+    if (jumlah > stokSekarang) {
+        javax.swing.JOptionPane.showMessageDialog(null,
+             "Stock tidak cukup! Stok tersedia: " + stokSekarang);
+        return false;  // ⛔ GAGAL
+    }
+
+    int stokBaru = stokSekarang - jumlah;
+
+    // Update stok
+    String sqlUpdate = "UPDATE tbmakanan SET stock = " + stokBaru +
+                       " WHERE product_id = " + id;
+
+    stm.executeUpdate(sqlUpdate);
+
+    return true; // ✔️ BERHASIL
+}
+
+     
         public void tampilkanMakanan(){
             try {
                 this.dtm.getDataVector().removeAllElements();

@@ -46,6 +46,16 @@ public class PilihMenu extends javax.swing.JFrame {
 
     uc.tampilkanMakanan();
     }
+    public void message(String pesan) {
+    javax.swing.JOptionPane.showMessageDialog(this, pesan);
+}
+public void refreshTable() throws SQLException {
+    MakananController uc = new MakananController();
+    DefaultTableModel dtm = uc.createTable();
+    this.tableMakan.setModel(dtm);
+    uc.tampilkanMakanan();
+}
+
     private void Gambar(javax.swing.JLabel label, String resourcePath) {
         ImageIcon imgIco = new ImageIcon(
             getClass().getResource(resourcePath)
@@ -84,6 +94,8 @@ public class PilihMenu extends javax.swing.JFrame {
         spinnerJumlah = new javax.swing.JSpinner();
         jLabel6 = new javax.swing.JLabel();
         lblId = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        lblStock = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("PilihMenu");
@@ -128,7 +140,7 @@ public class PilihMenu extends javax.swing.JFrame {
 
         lblHarga.setFont(new java.awt.Font("Segoe UI Black", 1, 18)); // NOI18N
         lblHarga.setForeground(new java.awt.Color(0, 0, 0));
-        lblHarga.setText("jLabel4");
+        lblHarga.setText("harga");
 
         jLabel4.setFont(new java.awt.Font("Segoe UI Black", 1, 18)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(0, 0, 0));
@@ -153,6 +165,14 @@ public class PilihMenu extends javax.swing.JFrame {
         lblId.setForeground(new java.awt.Color(0, 0, 0));
         lblId.setText("id");
 
+        jLabel7.setFont(new java.awt.Font("Segoe UI Black", 1, 18)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel7.setText("Stock                   :");
+
+        lblStock.setFont(new java.awt.Font("Segoe UI Black", 1, 18)); // NOI18N
+        lblStock.setForeground(new java.awt.Color(0, 0, 0));
+        lblStock.setText("stock");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -175,7 +195,8 @@ public class PilihMenu extends javax.swing.JFrame {
                             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(22, 22, 22)
@@ -183,9 +204,10 @@ public class PilihMenu extends javax.swing.JFrame {
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(18, 18, 18)
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(spinnerJumlah, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(lblHarga, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblId, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                                    .addComponent(lblId, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(spinnerJumlah, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblStock, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE))))))
                 .addContainerGap(454, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -214,11 +236,15 @@ public class PilihMenu extends javax.swing.JFrame {
                     .addComponent(jLabel4))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(spinnerJumlah, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                    .addComponent(jLabel7)
+                    .addComponent(lblStock))
+                .addGap(17, 17, 17)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(spinnerJumlah, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
+                .addGap(30, 30, 30)
                 .addComponent(jButton1)
-                .addGap(127, 127, 127))
+                .addGap(120, 120, 120))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -255,18 +281,30 @@ public class PilihMenu extends javax.swing.JFrame {
         int pilih = this.tableMakan.getSelectedRow();
         
         //3. data sebaris yg terambil di pasang di texfield
-        //dgn catatan baris = var pilih, kolom = 0 - 3
+        //dgn catatan baris = var pilih, kolom = 0 - 4  
         this.jLabel2.setText(dtm2.getValueAt(pilih, 1).toString());
         this.lblHarga.setText(dtm2.getValueAt(pilih, 3).toString());
         this.lblId.setText(dtm2.getValueAt(pilih, 0).toString());
+        this.lblStock.setText(dtm2.getValueAt(pilih, 4).toString());
     }//GEN-LAST:event_tableMakanMouseClicked
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-int id = Integer.parseInt(lblId.getText());
-String nama = jLabel2.getText();
-double harga = Double.parseDouble(lblHarga.getText());
-int jml = Integer.parseInt(spinnerJumlah.getValue().toString());
+        try {
+            int id = Integer.parseInt(lblId.getText());
+            String nama = jLabel2.getText();
+            double harga = Double.parseDouble(lblHarga.getText());
+            int jml = Integer.parseInt(spinnerJumlah.getValue().toString());
+            
+MakananController mc = new MakananController();
 
+// Jika stok gagal diupdate → JANGAN LANJUT
+boolean sukses = mc.updateStock(id, jml);
+
+if (!sukses) {
+    return; // ⛔ STOP! Jangan tambah ke transaksi
+}
+
+refreshTable();
 // VALIDASI
 if(jml <= 0){
     javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus lebih dari 0!");
@@ -319,6 +357,9 @@ this.setVisible(false);
 // update total di instance yang sudah ada
 Transaksi.getInstance().hitungTotal();
 Transaksi.getInstance().setVisible(true);
+        } catch (SQLException ex) {
+            System.getLogger(PilihMenu.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
 
     }//GEN-LAST:event_jButton1ActionPerformed
     
@@ -356,10 +397,12 @@ Transaksi.getInstance().setVisible(true);
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JLabel lblHarga;
     private javax.swing.JLabel lblId;
+    private javax.swing.JLabel lblStock;
     private javax.swing.JSpinner spinnerJumlah;
     private javax.swing.JTable tableMakan;
     // End of variables declaration//GEN-END:variables
