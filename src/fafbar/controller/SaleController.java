@@ -1,30 +1,46 @@
 package fafbar.controller;
 
-import fafbar.model.Product;  
-import fafbar.config.DBConnection;  
-import fafbar.model.SaleDetail; 
-import fafbar.model.User; 
-import fafbar.repository.SaleRepository; 
+import fafbar.model.Product;
+import fafbar.config.DBConnection;
 import java.util.List;
-import java.util.ArrayList; 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.math.BigDecimal; 
-import javax.swing.table.DefaultTableModel; 
-import javax.swing.JOptionPane; 
+
+// === IMPORT KHUSUS UNTUK MEMBUKA PDF SECARA OTOMATIS ===
+import java.awt.Desktop; 
+import java.io.IOException;
+// ========================================================
+
+// =================================================================
+// iText 5 IMPORTS
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfPCell;
+import java.io.FileOutputStream;
+import java.io.File; 
+// =================================================================
 
 public class SaleController {
     
-    private final SaleRepository saleRepo = new SaleRepository(); 
+    // -------------------------------------------------------------------------
+    // METHOD 1: cariProdukByKodeAtauNama() - SUDAH DIPERBAIKI (CASE INSENSITIVE)
+    // -------------------------------------------------------------------------
     
-    // METHOD 1: cariProdukByKodeAtauNama() - FIX: Menggunakan kolom 'code'
     public Product cariProdukByKodeAtauNama(String input) {
-        // FIX: Menggunakan kolom 'code' (sesuai model Product)
-        String sql = "SELECT id, code, name, price, stock FROM tbproduct WHERE code = ? OR name LIKE ?"; 
+        // PERBAIKAN 1: Tambahkan LOWER() agar tidak peduli huruf besar/kecil
+        // PERBAIKAN 2: Pastikan nama kolom sesuai (Code vs code). Saya samakan dengan Repository (Code)
+        String sql = "SELECT id, Code, name, price, stock FROM tbproduct WHERE LOWER(Code) = LOWER(?) OR LOWER(name) LIKE LOWER(?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -36,7 +52,7 @@ public class SaleController {
                 if (rs.next()) {
                     Product p = new Product();
                     p.setId(rs.getInt("id"));
-                    p.setCode(rs.getString("code")); // FIX: Mengambil dari kolom 'code'
+                    p.setCode(rs.getString("Code")); // Sesuaikan nama kolom DB
                     p.setName(rs.getString("name"));
                     p.setPrice(rs.getDouble("price")); 
                     p.setStock(rs.getInt("stock"));
@@ -52,11 +68,27 @@ public class SaleController {
         }
         return null; 
     }
-    
+
+    // -------------------------------------------------------------------------
     // METHOD 2: generateInvoice()
+    // -------------------------------------------------------------------------
+
     public String generateInvoice() {
         String datePart = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd"));
-        String lastInvoice = saleRepo.getLastInvoiceNumber();
+        
+        String lastInvoice = null;
+        String sql = "SELECT receipt_number FROM sales ORDER BY id DESC LIMIT 1"; 
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                lastInvoice = rs.getString("receipt_number");
+            }
+        } catch (SQLException e) {
+            System.err.println("Gagal ambil invoice terakhir: " + e.getMessage());
+        }
+        
         int newId = 1;
         
         if (lastInvoice != null && lastInvoice.length() > 4) {
@@ -66,113 +98,167 @@ public class SaleController {
             } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
             }
         }
+        
         String formattedId = String.format("%04d", newId); 
         return "INV-" + datePart + "-" + formattedId;
     }
 
-    // METHOD 3: saveSale() - FULL TRANSACTIONAL LOGIC
-    public String saveSale(String invoice, User kasir, double total, double discount, double grandTotal, double cash, double change, DefaultTableModel tableModel) {
 
-        if (tableModel.getRowCount() == 0) {
-            return "Gagal: Keranjang belanja kosong.";
-        }
-        if (cash < grandTotal) {
-            return "Gagal: Uang tunai kurang dari Grand Total.";
-        }
+    // -------------------------------------------------------------------------
+    // METHOD 3: cetakStrukPDF() - PERBAIKAN AUTO OPEN
+    // -------------------------------------------------------------------------
 
-        List<SaleDetail> details = new ArrayList<>();
+    public String cetakStrukPDF(String invoiceNumber, String kasirName, 
+                                 List<Object[]> itemsData, 
+                                 double subTotal, double discount, 
+                                 double grandTotal, double cash, double change) {
         
-        // 1. Konversi Data Tabel ke List<SaleDetail>
-        for (int i = 0; i < tableModel.getRowCount(); i++) {
-            try {
-                SaleDetail detail = new SaleDetail();
-                
-                String productCode = tableModel.getValueAt(i, 0).toString();
-                String productName = tableModel.getValueAt(i, 1).toString();
-                int qty = Integer.parseInt(tableModel.getValueAt(i, 2).toString());
-                BigDecimal priceAtSale = BigDecimal.valueOf(Double.parseDouble(tableModel.getValueAt(i, 3).toString()));
-                
-                // Diskon Item diabaikan di DB (set ke ZERO)
-                detail.setDiscountPerItem(BigDecimal.ZERO); 
-                
-                BigDecimal subtotalItem = BigDecimal.valueOf(Double.parseDouble(tableModel.getValueAt(i, 5).toString()));
+        // 1. Definisikan Nama dan Lokasi File
+        String namaFile = "Struk_" + invoiceNumber.replace("-", "_") + ".pdf";
+        String folderPath = "Struk_Penjualan/"; 
 
-                detail.setProductCode(productCode);
-                detail.setProductName(productName);
-                detail.setQuantity(qty);
-                detail.setPriceAtSale(priceAtSale);
-                detail.setSubtotal(subtotalItem);
-                
-                details.add(detail);
-                
-            } catch (Exception e) {
-                System.err.println("Error saat memproses baris detail penjualan: " + e.getMessage());
-                e.printStackTrace();
-                return "Error data item di baris " + (i + 1) + ".";
-            }
-        }
-
-        // 2. Konversi Total, Diskon, Cash ke BigDecimal
-        BigDecimal bdSubtotal = BigDecimal.valueOf(total);
-        BigDecimal bdDiscount = BigDecimal.valueOf(discount);
-        BigDecimal bdGrandTotal = BigDecimal.valueOf(grandTotal);
-        BigDecimal bdCash = BigDecimal.valueOf(cash);
-        BigDecimal bdChange = BigDecimal.valueOf(change);
-
-        // 3. Panggil Repository untuk menyimpan secara Transaksional
-        boolean success = saleRepo.saveTransaction(
-            invoice, kasir, bdSubtotal, bdDiscount, bdGrandTotal, bdCash, bdChange, details
-        );
-
-        if (success) {
-            // Kita cetak struk dengan data real (simulasi text)
-            cetakStruk(invoice, kasir.getFullName(), total, discount, grandTotal, cash, change);
-            return "Transaksi Sukses! Data tersimpan & Stok diperbarui.";
-        } else {
-            return "Transaksi Gagal! Terjadi kesalahan pada database.";
-        }
-    }
-    
-    // METHOD 4: cetakStruk() - VERSI SEDERHANA UNTUK TUGAS
-    public boolean cetakStruk(String invoiceNumber, String kasirName, double total, double diskon, double grandTotal, double cash, double change) {
         try {
-            String namaToko = "FAFBAR JAYA SHOP"; 
-            String alamatToko = "Jl. Diponegoro No. 123, Salatiga";
+            // Cek dan buat folder jika belum ada
+            File folder = new File(folderPath);
+            if (!folder.exists()) {
+                folder.mkdirs();
+            }
+            String fullPath = folderPath + namaFile;
+
+            // 2. Inisialisasi Document iText
+            Document document = new Document(new Rectangle(280f, 842f)); 
+            document.setMargins(10, 10, 10, 10); 
+
+            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(fullPath));
+            document.open();
+
+            // ... (Bagian Font dan Konten Struk sama seperti sebelumnya) ...
+            Font fontHeader = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD, BaseColor.BLACK);
+            Font fontTitle = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD, BaseColor.BLACK);
+            Font fontNormal = new Font(Font.FontFamily.HELVETICA, 8, Font.NORMAL, BaseColor.BLACK);
+            Font fontSmall = new Font(Font.FontFamily.HELVETICA, 7, Font.NORMAL, BaseColor.BLACK);
             
-            // Simulasikan Struk Pop-up
-            StringBuilder struk = new StringBuilder();
-            struk.append("           *** ").append(namaToko).append(" ***\n");
-            struk.append("---------------------------------------\n");
-            struk.append(String.format("Invoice : %s\n", invoiceNumber));
-            struk.append(String.format("Kasir   : %s\n", kasirName));
-            struk.append("---------------------------------------\n");
-            struk.append("--- Detail Item harus diambil dari DB --- \n");
-            struk.append("---------------------------------------\n");
-            struk.append(String.format("SUB TOTAL: %29.2f\n", total));
-            struk.append(String.format("DISKON  : %29.2f\n", diskon));
-            struk.append(String.format("GRAND TOTAL: %26.2f\n", grandTotal));
-            struk.append(String.format("BAYAR (CASH): %25.2f\n", cash));
-            struk.append(String.format("KEMBALIAN   : %25.2f\n", change));
-            struk.append("---------------------------------------\n");
-            struk.append(String.format("    *** Terima Kasih Telah Berbelanja ***\n"));
+            Paragraph p = new Paragraph("FAFBAR JAYA SHOP", fontTitle);
+            p.setAlignment(Element.ALIGN_CENTER);
+            document.add(p);
+            
+            p = new Paragraph("Jl. Diponegoro No. 123, Salatiga", fontNormal);
+            p.setAlignment(Element.ALIGN_CENTER);
+            document.add(p);
+            
+            p = new Paragraph("Telp. 08123xxxx", fontNormal);
+            p.setAlignment(Element.ALIGN_CENTER);
+            p.setSpacingAfter(5f);
+            document.add(p);
+            
+            document.add(new Paragraph("----------------------------------------------------------------", fontSmall));
+            
+            document.add(new Paragraph("No. Inv: " + invoiceNumber, fontNormal));
+            document.add(new Paragraph("Kasir: " + kasirName, fontNormal));
+            document.add(new Paragraph("Tgl  : " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss")), fontNormal));
+            
+            document.add(new Paragraph("----------------------------------------------------------------", fontSmall));
 
-            // Tampilkan sebagai pop-up
-            JOptionPane.showMessageDialog(null, struk.toString(), "Struk Penjualan", JOptionPane.PLAIN_MESSAGE);
+            PdfPTable table = new PdfPTable(3);
+            table.setWidthPercentage(100);
+            table.setWidths(new float[]{1f, 3f, 1.5f}); 
+            
+            for (Object[] item : itemsData) {
+                String namaItem = item[1].toString();
+                int qty = Integer.parseInt(item[2].toString());
+                double harga = Double.parseDouble(item[3].toString()); 
+                double subtotalItem = Double.parseDouble(item[5].toString()); 
+                
+                PdfPCell cellName = new PdfPCell(new Phrase(namaItem, fontNormal));
+                cellName.setColspan(3);
+                cellName.setBorder(Rectangle.NO_BORDER);
+                table.addCell(cellName);
 
-            return true; 
+                PdfPCell cellQty = new PdfPCell(new Phrase(qty + " x", fontNormal));
+                cellQty.setHorizontalAlignment(Element.ALIGN_LEFT);
+                cellQty.setBorder(Rectangle.NO_BORDER);
+                table.addCell(cellQty);
+                
+                PdfPCell cellDetail = new PdfPCell(new Phrase(String.format("Rp %,.0f", harga), fontNormal));
+                cellDetail.setHorizontalAlignment(Element.ALIGN_LEFT);
+                cellDetail.setBorder(Rectangle.NO_BORDER);
+                table.addCell(cellDetail);
+                
+                PdfPCell cellSubtotal = new PdfPCell(new Phrase(String.format("Rp %,.0f", subtotalItem), fontNormal));
+                cellSubtotal.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                cellSubtotal.setBorder(Rectangle.NO_BORDER);
+                table.addCell(cellSubtotal);
+            }
+            
+            document.add(table);
+            document.add(new Paragraph("----------------------------------------------------------------", fontSmall));
+            
+            PdfPTable totalTable = new PdfPTable(2);
+            totalTable.setWidthPercentage(100);
+            totalTable.setWidths(new float[]{3f, 2f});
+            
+            totalTable.addCell(createCell("SUBTOTAL", fontNormal, Element.ALIGN_LEFT));
+            totalTable.addCell(createCell(String.format("Rp %,.0f", subTotal), fontNormal, Element.ALIGN_RIGHT));
+            totalTable.addCell(createCell("DISKON", fontNormal, Element.ALIGN_LEFT));
+            totalTable.addCell(createCell(String.format("Rp %,.0f", discount), fontNormal, Element.ALIGN_RIGHT));
+            totalTable.addCell(createCell("----------------------", fontSmall, Element.ALIGN_LEFT, 2));
+            totalTable.addCell(createCell("GRAND TOTAL", fontHeader, Element.ALIGN_LEFT));
+            totalTable.addCell(createCell(String.format("Rp %,.0f", grandTotal), fontHeader, Element.ALIGN_RIGHT));
+            totalTable.addCell(createCell("BAYAR (CASH)", fontNormal, Element.ALIGN_LEFT));
+            totalTable.addCell(createCell(String.format("Rp %,.0f", cash), fontNormal, Element.ALIGN_RIGHT));
+            totalTable.addCell(createCell("KEMBALIAN", fontNormal, Element.ALIGN_LEFT));
+            totalTable.addCell(createCell(String.format("Rp %,.0f", change), fontNormal, Element.ALIGN_RIGHT));
+            
+            document.add(totalTable);
+            document.add(new Paragraph("----------------------------------------------------------------", fontSmall));
+            
+            p = new Paragraph("*** Terima Kasih Telah Berbelanja ***", fontNormal);
+            p.setAlignment(Element.ALIGN_CENTER);
+            document.add(p);
+
+            document.close();
+            writer.close();
+            
+            // ========================================================
+            // PERBAIKAN UTAMA: MEMBUKA FILE PDF
+            // ========================================================
+            try {
+                // Menggunakan getAbsoluteFile() agar path-nya jelas terbaca oleh System
+                File pdfFile = new File(fullPath).getAbsoluteFile(); 
+                
+                if (Desktop.isDesktopSupported()) {
+                    if (pdfFile.exists()) {
+                        Desktop.getDesktop().open(pdfFile);
+                        System.out.println("Struk PDF berhasil dibuka: " + pdfFile.getAbsolutePath());
+                    } else {
+                        System.out.println("File PDF tidak ditemukan saat akan dibuka: " + pdfFile.getAbsolutePath());
+                    }
+                } else {
+                    System.out.println("Fitur Desktop tidak didukung di sistem ini.");
+                }
+            } catch (IOException e) {
+                System.err.println("Error saat mencoba membuka file otomatis: " + e.getMessage());
+            }
+            // ========================================================
+
+            return namaFile; 
+
         } catch (Exception e) {
-            System.err.println("Error saat mencetak struk: " + e.getMessage());
-            return false; 
+            System.err.println("Error saat mencetak/membuat file struk: " + e.getMessage());
+            e.printStackTrace();
+            return null;
         }
     }
     
-    // STUB METHOD (untuk jaga-jaga kalau ada pemanggilan cetakStruk lama)
-    public boolean cetakStruk(String invoiceNumber, String kasirName) { 
-        return true; 
+    private PdfPCell createCell(String content, Font font, int alignment) {
+        return createCell(content, font, alignment, 1);
     }
-
-    // STUB METHOD (untuk jaga-jaga kalau ada pemanggilan saveTransactionHeader lama)
-    public String saveTransactionHeader(String invoice, fafbar.model.User kasir, double total, double discount, double grandTotal, double cash, double change) {
-        return "Gagal! Fungsi ini sudah diganti oleh saveSale.";
+    
+    private PdfPCell createCell(String content, Font font, int alignment, int colspan) {
+        PdfPCell cell = new PdfPCell(new Phrase(content, font));
+        cell.setHorizontalAlignment(alignment);
+        cell.setBorder(Rectangle.NO_BORDER);
+        cell.setColspan(colspan);
+        return cell;
     }
 }

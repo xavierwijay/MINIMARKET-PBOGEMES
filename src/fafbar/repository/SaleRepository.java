@@ -10,7 +10,8 @@ import java.util.List;
 public class SaleRepository {
 
     public String getLastInvoiceNumber() {
-        String sql = "SELECT receipt_number FROM sales ORDER BY id DESC LIMIT 1";
+        // FIX KRITIS #1: Mengubah ORDER BY dari 'id' menjadi 'created_at' 
+        String sql = "SELECT receipt_number FROM sales ORDER BY created_at DESC LIMIT 1";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -33,14 +34,15 @@ public class SaleRepository {
                                    BigDecimal totalAmount, BigDecimal amountPaid, 
                                    BigDecimal changeAmount, List<SaleDetail> details) {
         
-        // 1. QUERY SALES (Header) - 7 Parameters
+        // 1. QUERY SALES (Header)
         String sqlSale = "INSERT INTO SALES (receipt_number, user_id, subtotal, discount_total, total_amount, amount_paid, change_amount) VALUES (?, ?, ?, ?, ?, ?, ?)";
         
-        // 2. QUERY SALES_DETAILS (Detail) - 6 Columns
+        // 2. QUERY SALES_DETAILS (Detail)
         String sqlDetail = "INSERT INTO sales_details (receipt_number, product_code, product_name, qty, price, subtotal) VALUES (?, ?, ?, ?, ?, ?)";
         
-        // 3. QUERY UPDATE STOCK - Kolom: stock, code
-        String sqlStockUpdate = "UPDATE tbproduct SET stock = stock - ? WHERE code = ?";
+        // 3. QUERY UPDATE STOCK
+        // FIX KRITIS #2: Menggunakan kolom 'Code' (ejaan database Anda)
+        String sqlStockUpdate = "UPDATE tbproduct SET stock = stock - ? WHERE Code = ?";
 
         Connection conn = null;
         try {
@@ -68,7 +70,7 @@ public class SaleRepository {
 
                 for (SaleDetail detail : details) {
                     
-                    // 1. Simpan Detail Item (BINDING 6 PARAMETER)
+                    // 1. Simpan Detail Item
                     psDetail.setString(1, invoiceNumber); 
                     psDetail.setString(2, detail.getProductCode());
                     psDetail.setString(3, detail.getProductName());

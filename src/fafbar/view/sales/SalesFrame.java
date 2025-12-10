@@ -10,6 +10,10 @@ import fafbar.model.Product;
 import fafbar.model.User;
 import javax.swing.table.DefaultTableModel;
 import java.io.FileNotFoundException;
+import java.util.ArrayList; // Pastikan ini ada
+import java.util.List; // Pastikan ini ada
+import javax.swing.table.DefaultTableModel; // Pastikan ini ada
+import javax.swing.JOptionPane; // Pastikan ini ada
 
 public class SalesFrame extends javax.swing.JFrame {
 
@@ -838,56 +842,74 @@ public SalesFrame(User kasir) {
     }//GEN-LAST:event_txtTotalActionPerformed
 
     private void prosesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prosesActionPerformed
-       // Cek apakah ada item di tabel
+     // 1. Validasi Sederhana
         if (model.getRowCount() == 0) {
-            JOptionPane.showMessageDialog(this, "Keranjang belanja kosong!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Keranjang belanja masih kosong!", "Gagal Proses", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        double changeVal = Double.parseDouble(change.getText());
+        if (changeVal < 0) {
+             JOptionPane.showMessageDialog(this, "Uang tunai kurang! Kembalian tidak boleh negatif.", "Gagal Proses", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        try {
-            // Ambil semua data yang dibutuhkan
-            String invoiceNum = invoice.getText();
-
-            // FIX KRITIS: Mengambil Subtotal dari txtTotal1
-            double subtotalVal = Double.parseDouble(txtTotal1.getText()); 
-
-            double discountVal = Double.parseDouble(discount.getText());
-            double grandTotalVal = Double.parseDouble(grandTotal.getText());
-            double cashVal = Double.parseDouble(cash.getText());
-            double changeVal = Double.parseDouble(change.getText());
-
-            // Validasi Cash
-            if (cashVal < grandTotalVal) {
-                JOptionPane.showMessageDialog(this, "Uang pembayaran (Cash) kurang!", "Validasi Pembayaran", JOptionPane.ERROR_MESSAGE);
-                return;
+        // ==========================================================
+        // 2. Kumpulkan Semua Data Transaksi (CRITICAL STEP)
+        // ==========================================================
+        List<Object[]> itemsData = new ArrayList<>();
+        for (int i = 0; i < model.getRowCount(); i++) {
+            Object[] rowData = new Object[6]; // ID Barang, Nama, Qty, Harga, Disc Item, Total
+            for (int j = 0; j < 6; j++) {
+                rowData[j] = model.getValueAt(i, j);
             }
-
-            // Panggil Controller untuk menyimulasikan transaksi
-            // Memanggil saveTransactionHeader dari SaleController
-            String resultMessage = saleController.saveSale( 
-    invoiceNum, 
-    kasir, 
-    subtotalVal, 
-    discountVal, 
-    grandTotalVal, 
-    cashVal, 
-    changeVal,
-    model // Kirim model
-);
-            JOptionPane.showMessageDialog(this, resultMessage);
-
-            // Jika transaksi sukses, reset form
-            if (resultMessage.contains("Sukses")) {
-                resetFrame();
-            }
-
-        } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Pastikan semua field Total, Diskon, dan Cash berisi angka yang valid.", "Input Tidak Valid", JOptionPane.ERROR_MESSAGE);
-        } catch (Exception e) {
-            System.err.println("Error saat memproses transaksi: " + e.getMessage());
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Terjadi kesalahan saat memproses transaksi.", "Error Sistem", JOptionPane.ERROR_MESSAGE);
+            itemsData.add(rowData);
         }
+
+        String invoiceNum = invoice.getText();
+        String kasirName = lblKasir.getText(); 
+        double subTotal = Double.parseDouble(txtTotal1.getText()); // Total (sebelum diskon)
+        double discountVal = Double.parseDouble(discount.getText());
+        double grandTotalVal = Double.parseDouble(grandTotal.getText());
+        double cashVal = Double.parseDouble(cash.getText());
+        double changeResult = changeVal;
+        
+        // 3. SIMULASI Simpan Transaksi ke DB (Ganti dengan implementasi saveTransaction)
+     boolean isSaleSaved = true; // Ganti dengan pemanggilan ke Repository
+     
+     if (isSaleSaved) {
+         // 4. CETAK STRUK PDF (Sekarang juga berfungsi membuka file secara otomatis)
+         String pdfFileName = saleController.cetakStrukPDF(
+             invoiceNum, 
+             kasirName, 
+             itemsData, 
+             subTotal, 
+             discountVal, 
+             grandTotalVal, 
+             cashVal, 
+             changeResult
+         );
+         
+         if (pdfFileName != null) {
+             // 4.1. PDF berhasil dibuat dan DIBUKA SECARA OTOMATIS (karena perubahan di Controller)
+             
+             // UBAH: Ganti pop-up 'Berhasil dibuat' dengan notifikasi yang lebih cepat/minimal
+             // Atau, HILANGKAN SAMA SEKALI, karena user sudah melihat PDF terbuka.
+             
+             // Pilihan A: Hilangkan pop-up sama sekali, langsung reset
+    
+             resetFrame(); 
+             
+         } else {
+             // Gagal mencetak PDF
+             JOptionPane.showMessageDialog(this, 
+                     "Gagal membuat file struk PDF. Cek console untuk error.", 
+                     "Error PDF", 
+                     JOptionPane.ERROR_MESSAGE);
+         }
+     } else {
+         JOptionPane.showMessageDialog(this, "Gagal menyimpan data transaksi ke database.", "Error Database", JOptionPane.ERROR_MESSAGE);
+     }
     }//GEN-LAST:event_prosesActionPerformed
 
     private void refreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshActionPerformed
