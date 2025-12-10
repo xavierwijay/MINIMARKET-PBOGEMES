@@ -13,6 +13,7 @@ import fafbar.view.user.UserFrame;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JOptionPane;
+import fafbar.view.auth.LoginFrame;
 import javax.swing.table.DefaultTableModel;
 /**
  *

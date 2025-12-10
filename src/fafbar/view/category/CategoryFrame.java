@@ -12,6 +12,7 @@ import fafbar.view.product.ProductFrame;
 import fafbar.view.report.ReportFrame;
 import fafbar.view.sales.SalesFrame;
 import fafbar.view.user.UserFrame;
+import fafbar.view.auth.LoginFrame;
 /**
  *
  * @author Lenovo

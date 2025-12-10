@@ -18,7 +18,8 @@ public class UserRepository {
         user.setId(rs.getInt("id"));
         user.setUsername(rs.getString("username"));
         user.setPassword(rs.getString("password"));
-        user.setFullName(rs.getString("full_name"));
+        // FIX: Menggunakan kolom "name" dari database, bukan "full_name"
+        user.setFullName(rs.getString("name"));
         user.setRole(rs.getString("role"));
         user.setEmail(rs.getString("email"));
         user.setIsActive(rs.getBoolean("is_active"));
@@ -35,7 +36,7 @@ public class UserRepository {
         List<User> userList = new ArrayList<>();
 
         String sql = """
-                SELECT id, username, password, full_name, role, email, is_active, created_at 
+                SELECT id, username, password, name, role, email, is_active, created_at 
                 FROM USERS
                 """;
 
@@ -62,7 +63,7 @@ public class UserRepository {
         List<User> userList = new ArrayList<>();
 
         String sql = """
-                SELECT id, username, password, full_name, role, email, is_active, created_at
+                SELECT id, username, password, name, role, email, is_active, created_at
                 FROM USERS
                 WHERE role = ?
                 """;

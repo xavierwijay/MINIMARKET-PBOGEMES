@@ -17,11 +17,11 @@ public class ReportRepository {
     public List<Object[]> getFilteredSalesData(Date dateFrom, Date dateTo, int userId) {
         List<Object[]> reportData = new ArrayList<>();
         
+        // Sudah menggunakan alias cashier_name
         String sql = "SELECT s.receipt_number, s.created_at, s.subtotal, s.discount_total, " +
-                     "s.total_amount, s.amount_paid, s.change_amount, u.name AS cashier_name " +
-                     "FROM SALES s JOIN USERS u ON s.user_id = u.id " +
-                     "WHERE s.created_at >= ? AND s.created_at < ?"; // Filter menggunakan created_at
-        
+                 "s.total_amount, s.amount_paid, s.change_amount, u.name AS cashier_name " +
+                 "FROM SALES s JOIN USERS u ON s.user_id = u.id " + // Pastikan ini benar (u.name)
+                 "WHERE s.created_at >= ? AND s.created_at < ?";
         if (userId > 0) {
             sql += " AND s.user_id = ?";
         }
@@ -62,10 +62,11 @@ public class ReportRepository {
             // --- 4. EKSEKUSI QUERY DAN MAPPING ---
             try (ResultSet rs = pst.executeQuery()) {
                 while (rs.next()) {
+                    // ...
                     Object[] row = new Object[]{
                         rs.getString("receipt_number"),
                         DATETIME_FORMAT.format(rs.getTimestamp("created_at")), 
-                        rs.getString("cashier_name"),
+                        rs.getString("cashier_name"), // Mengambil dari alias SQL di atas
                         rs.getBigDecimal("subtotal").intValue(),
                         rs.getBigDecimal("discount_total").intValue(),
                         rs.getBigDecimal("total_amount").intValue(),

@@ -9,12 +9,6 @@ import javax.swing.Timer;
 import fafbar.model.Product;
 import fafbar.model.User;
 import javax.swing.table.DefaultTableModel;
-//import com.itextpdf.kernel.pdf.PdfDocument;
-//import com.itextpdf.kernel.pdf.PdfWriter;
-//import com.itextpdf.layout.Document;
-//import com.itextpdf.layout.element.Paragraph;
-//import com.itextpdf.layout.element.Table;
-//import com.itextpdf.layout.properties.TextAlignment;
 import java.io.FileNotFoundException;
 
 public class SalesFrame extends javax.swing.JFrame {
@@ -54,158 +48,172 @@ public SalesFrame(User kasir) {
     // PERBAIKAN KRITIS: Listener Kolom Qty Tabel (menggunakan DOUBLE)
     // -----------------------------------------------------------------
     // HAPUS KODE LAMA, GANTI DENGAN INI:
-model.addTableModelListener(e -> {
-    int row = e.getFirstRow();
-    int col = e.getColumn();
+    model.addTableModelListener(e -> {
+        int row = e.getFirstRow();
+        int col = e.getColumn();
 
-    // PENTING: Kita cek apakah yang berubah Kolom Qty (2) ATAU Kolom Disc Item (4)
-    if ((col == 2 || col == 4) && row >= 0) {
-        try {
-            // 1. Ambil Qty (Default 0 jika kosong/error)
-            Object qtyObj = model.getValueAt(row, 2);
-            int qty = (qtyObj == null || qtyObj.toString().isEmpty()) ? 0 : Integer.parseInt(qtyObj.toString());
-            
-            // 2. Ambil Harga (Default 0.0)
-            Object priceObj = model.getValueAt(row, 3);
-            double harga = (priceObj == null || priceObj.toString().isEmpty()) ? 0.0 : Double.parseDouble(priceObj.toString());
-            
-            // 3. Ambil Disc Item (Kolom 4) - Ini yang baru!
-            Object discObj = model.getValueAt(row, 4);
-            double discItem = 0.0;
-            if (discObj != null && !discObj.toString().isEmpty()) {
-                discItem = Double.parseDouble(discObj.toString());
+        // PENTING: Kita cek apakah yang berubah Kolom Qty (2) ATAU Kolom Disc Item (4)
+        if ((col == 2 || col == 4) && row >= 0) {
+            try {
+                // 1. Ambil Qty (Default 0 jika kosong/error)
+                Object qtyObj = model.getValueAt(row, 2);
+                int qty = (qtyObj == null || qtyObj.toString().isEmpty()) ? 0 : Integer.parseInt(qtyObj.toString());
+
+                // 2. Ambil Harga (Default 0.0)
+                Object priceObj = model.getValueAt(row, 3);
+                double harga = (priceObj == null || priceObj.toString().isEmpty()) ? 0.0 : Double.parseDouble(priceObj.toString());
+
+                // 3. Ambil Disc Item (Kolom 4) - Ini yang baru!
+                Object discObj = model.getValueAt(row, 4);
+                double discItem = 0.0;
+                if (discObj != null && !discObj.toString().isEmpty()) {
+                    discItem = Double.parseDouble(discObj.toString());
+                }
+
+                // 4. Rumus: (Qty * Harga) - Diskon Item
+                double subtotal = (qty * harga) - discItem;
+
+                // Validasi: Jangan biarkan Total minus
+                if (subtotal < 0) {
+                    subtotal = 0;
+                    JOptionPane.showMessageDialog(this, "Diskon tidak boleh melebihi harga total barang!");
+                }
+
+                // 5. Update Kolom Total (Index 5)
+                // Kita pakai invokeLater supaya update UI tidak bentrok dengan listener yang sedang berjalan
+                final double finalSubtotal = subtotal;
+                javax.swing.SwingUtilities.invokeLater(() -> {
+                    model.setValueAt(finalSubtotal, row, 5);
+                    hitungTotal(); // Update Total Besar di bawah
+                });
+
+            } catch (NumberFormatException ex) {
+                // Error diam saja saat ngetik, nanti divalidasi pas Enter
+            } catch (Exception ex) {
+                System.err.println("Error hitung tabel: " + ex.getMessage());
             }
-            
-            // 4. Rumus: (Qty * Harga) - Diskon Item
-            double subtotal = (qty * harga) - discItem;
-
-            // Validasi: Jangan biarkan Total minus
-            if (subtotal < 0) {
-                subtotal = 0;
-                JOptionPane.showMessageDialog(this, "Diskon tidak boleh melebihi harga total barang!");
-            }
-
-            // 5. Update Kolom Total (Index 5)
-            // Kita pakai invokeLater supaya update UI tidak bentrok dengan listener yang sedang berjalan
-            final double finalSubtotal = subtotal;
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                model.setValueAt(finalSubtotal, row, 5);
-                hitungTotal(); // Update Total Besar di bawah
-            });
-            
-        } catch (NumberFormatException ex) {
-            // Error diam saja saat ngetik, nanti divalidasi pas Enter
-        } catch (Exception ex) {
-            System.err.println("Error hitung tabel: " + ex.getMessage());
         }
-    }
-});
-}
-
-// Ini adalah method tambahItemDariInput() di SalesFrame.java (ASUMSI)
-
-private void tambahItemDariInput() {
-    try {
-        String input = barcode.getText().trim(); 
-
-        if (input.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Masukkan kode/barcode atau nama produk!", "Peringatan", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        
-        // FIX: Pastikan ini dikonversi dengan aman (try-catch sudah ada)
-        int qtyVal = Integer.parseInt(qty.getValue().toString()); 
-
-        Product produk = saleController.cariProdukByKodeAtauNama(input); 
-
-        if (produk == null) {
-            JOptionPane.showMessageDialog(this, "Produk dengan kode/nama '" + input + "' tidak ditemukan!", "Produk Tidak Ditemukan", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        // FIX: Menggunakan getCode() dan getName() (bukan getKode dan getFullName)
-        // Pastikan Model Product punya setUnit(String)
-        tambahItemKeTabel(produk.getCode(), produk.getName(), qtyVal, produk.getPrice()); 
-
-        // reset input
-        barcode.setText("");
-        qty.setValue(1);
-        
-        // FIX: Kembalikan fokus kursor ke field barcode
-        barcode.requestFocus(); 
-
-    } catch (NumberFormatException ex) {
-        JOptionPane.showMessageDialog(this, "Kuantitas (Qty) harus berupa angka yang valid.", "Input Tidak Valid", JOptionPane.ERROR_MESSAGE);
-    } catch (Exception ex) {
-        System.err.println("Error saat memproses input item: " + ex.getMessage());
-        JOptionPane.showMessageDialog(this, "Terjadi kesalahan sistem: " + ex.getMessage(), "Error Sistem", JOptionPane.ERROR_MESSAGE);
-    }
-}
-
-private void tambahItemKeTabel(String kode, String nama, int qty, double harga) {
-    // 1. CEK DULU: Apakah barang dengan ID (kode) ini sudah ada di tabel?
-    for (int i = 0; i < model.getRowCount(); i++) {
-        String idDiTabel = (String) model.getValueAt(i, 0); // Ambil ID dari Kolom 0
-
-        // Jika ID-nya sama, berarti barang sudah ada
-        if (idDiTabel != null && idDiTabel.equals(kode)) {
-            
-            // --- UPDATE QTY BARIS TERSEBUT ---
-            
-            // Ambil Qty lama dari tabel
-            int qtyLama = Integer.parseInt(model.getValueAt(i, 2).toString());
-            int qtyBaru = qtyLama + qty;
-
-            // Masukkan Qty baru ke tabel (Kolom 2)
-            // Note: Ini otomatis akan memicu Listener hitung ulang yang sudah kita buat sebelumnya
-            model.setValueAt(qtyBaru, i, 2); 
-            
-            // Opsional: Paksa hitung ulang subtotal di sini biar visualnya langsung update
-            // (Jaga-jaga kalau listener telat merespon)
-            double discItem = Double.parseDouble(model.getValueAt(i, 4).toString());
-            double subtotalBaru = (qtyBaru * harga) - discItem;
-            model.setValueAt(subtotalBaru, i, 5); // Update Kolom Total (Index 5)
-
-            // Hitung Total Belanja Keseluruhan (TxtTotal)
-            hitungTotal();
-
-            // PENTING: Stop method ini di sini (Return). Jangan lanjut ke addRow di bawah!
-            return; 
-        }
-    }
-
-    // 2. KALAU BARANG BELUM ADA (Loop selesai tanpa match), BARU TAMBAH BARIS BARU
-    double subtotal = qty * harga;
-
-    model.addRow(new Object[]{
-        kode, 
-        nama, 
-        qty, 
-        harga, 
-        0.0, // Default Diskon 0.0
-        subtotal 
     });
-
-    hitungTotal();
-}
-
-
-private void hitungTotal() {
-    double total = 0.0; 
-
-    for (int i = 0; i < model.getRowCount(); i++) {
-        
-        double subtotal = Double.parseDouble(model.getValueAt(i, 5).toString());
-        total += subtotal;
     }
 
-   
-    txtTotal.setText(String.valueOf(total));
-    txtTotal1.setText(String.valueOf(total));
-    
-    
-    hitungGrandTotal(); 
-}
+    // Ini adalah method tambahItemDariInput() di SalesFrame.java (ASUMSI)
+
+    // di dalam private void tambahItemDariInput() {...
+    private void tambahItemDariInput() {
+        try {
+            String input = barcode.getText().trim(); 
+            if (input.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Masukkan kode/barcode atau nama produk!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int qtyVal = Integer.parseInt(qty.getValue().toString()); 
+            Product produk = saleController.cariProdukByKodeAtauNama(input); 
+
+            if (produk == null) {
+                JOptionPane.showMessageDialog(this, "Produk dengan kode/nama '" + input + "' tidak ditemukan!", "Produk Tidak Ditemukan", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // ===============================================
+            // --- LOGIKA BARU: VALIDASI STOK CUKUP ---
+            // ===============================================
+
+            // 1. Hitung total Qty yang akan diminta (Qty dari input + Qty yang sudah ada di tabel)
+            int qtySudahDiKeranjang = 0;
+            for (int i = 0; i < model.getRowCount(); i++) {
+                if (model.getValueAt(i, 0).toString().equals(produk.getCode())) {
+                    qtySudahDiKeranjang = Integer.parseInt(model.getValueAt(i, 2).toString());
+                    break;
+                }
+            }
+            int totalQtyDiminta = qtyVal + qtySudahDiKeranjang;
+
+            // 2. Bandingkan dengan stok produk di DB (produk.getStock())
+            if (totalQtyDiminta > produk.getStock()) {
+                // Tampilkan pesan jika stok tidak cukup
+                JOptionPane.showMessageDialog(this, 
+                    "Stok '" + produk.getName() + "' tidak cukup.\nStok tersedia: " + produk.getStock() + " (sudah termasuk yang di keranjang: " + qtySudahDiKeranjang + ")", 
+                    "Stok Kurang", JOptionPane.WARNING_MESSAGE);
+                return; // Hentikan proses penambahan item
+            }
+
+            // ===============================================
+            // --- END LOGIKA BARU ---
+            // ===============================================
+
+            // Jika stok cukup, lanjutkan menambah item ke tabel
+            tambahItemKeTabel(produk.getCode(), produk.getName(), qtyVal, produk.getPrice()); 
+
+            // reset input
+            barcode.setText("");
+            qty.setValue(1);
+            barcode.requestFocus(); 
+
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Kuantitas (Qty) harus berupa angka yang valid.", "Input Tidak Valid", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            System.err.println("Error saat memproses input item: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Terjadi kesalahan sistem: " + ex.getMessage(), "Error Sistem", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    // ...
+    private void tambahItemKeTabel(String kode, String nama, int qtyInput, double harga) {
+        boolean produkSudahAda = false;
+        int barisDitemukan = -1;
+
+        // 1. Cek apakah kode barang sudah ada di tabel?
+        for (int i = 0; i < model.getRowCount(); i++) {
+            String kodeDiTabel = model.getValueAt(i, 0).toString(); // Ambil kode dari kolom 0
+
+            if (kodeDiTabel.equals(kode)) {
+                produkSudahAda = true;
+                barisDitemukan = i;
+                break; // Berhenti looping kalau sudah ketemu
+            }
+        }
+
+        if (produkSudahAda) {
+            // 2. Kalau ada, update Qty dan Total-nya saja
+            int qtyLama = Integer.parseInt(model.getValueAt(barisDitemukan, 2).toString());
+            int qtyBaru = qtyLama + qtyInput;
+            double subtotalBaru = qtyBaru * harga;
+
+            model.setValueAt(qtyBaru, barisDitemukan, 2); // Update Kolom Qty
+            model.setValueAt(subtotalBaru, barisDitemukan, 5); // Update Kolom Total
+        } else {
+            // 3. Kalau belum ada, tambahkan baris baru
+            double subtotal = qtyInput * harga;
+            model.addRow(new Object[]{
+                kode, 
+                nama, 
+                qtyInput, 
+                harga, 
+                0.0, // Diskon item 0
+                subtotal
+            });
+        }
+
+        // Hitung ulang total belanjaan
+        hitungTotal();
+    }
+
+    private void hitungTotal() {
+        double subtotal = 0.0; 
+
+        for (int i = 0; i < model.getRowCount(); i++) {
+            // Kolom 5 adalah kolom "Total" item (Harga per item * Qty - Disc Item)
+            // Ini adalah subtotal per item
+            double subtotalItem = Double.parseDouble(model.getValueAt(i, 5).toString());
+            subtotal += subtotalItem;
+        }
+
+        // txtTotal1: Total di bagian bawah (kita anggap ini Subtotal)
+        txtTotal1.setText(String.valueOf(subtotal)); 
+
+        // Panggil hitungGrandTotal() untuk mengupdate kotak merah atas
+        hitungGrandTotal(); 
+    }
 
      private void tampilkanNamaKasir() {
     // Cek dulu apakah objek kasir ada isinya (biar gak error NullPointer)
@@ -245,21 +253,25 @@ private void hitungTotal() {
     }
     private void hitungGrandTotal() {
     try {
-        // 1. Ambil Nilai Total
-        double total = Double.parseDouble(txtTotal.getText());
+        // 1. Ambil Nilai Subtotal (dari txtTotal1)
+        double subtotal = Double.parseDouble(txtTotal1.getText()); // Ambil Subtotal
         
-        // 2. Ambil Nilai Diskon
+        // 2. Ambil Nilai Diskon Global
         String discText = discount.getText().trim().isEmpty() ? "0" : discount.getText();
         double discVal = Double.parseDouble(discText);
         
         // 3. Hitung Grand Total
-        double grandTotalVal = total - discVal;
+        double grandTotalVal = subtotal - discVal;
         if (grandTotalVal < 0) {
             grandTotalVal = 0;
-            // Opsi: Beri peringatan jika diskon terlalu besar
+            // Ini akan memastikan Grand Total tidak negatif
         }
         
+        // Output 1: Update field Grand Total (Bawah)
         grandTotal.setText(String.valueOf(grandTotalVal));
+
+        // Output 2: Update Kotak Merah Besar (Atas)
+        txtTotal.setText(String.valueOf(grandTotalVal)); // INI ADALAH FIX UNTUK KOTAK MERAH
 
         // 4. Ambil Nilai Cash (Uang Tunai)
         String cashText = cash.getText().trim().isEmpty() ? "0" : cash.getText();
@@ -272,9 +284,9 @@ private void hitungTotal() {
 
         } catch (NumberFormatException e) {
             // Ini terjadi jika user menginput huruf di diskon/cash
-            JOptionPane.showMessageDialog(this, "Input Total, Diskon, atau Cash harus berupa angka.", "Error Input", JOptionPane.ERROR_MESSAGE);
+            // Opsional: Anda bisa set Grand Total dan Change ke 0 saat error input
         }
-    }
+}
     
 
         private void resetFrame() {
@@ -826,83 +838,52 @@ private void hitungTotal() {
     }//GEN-LAST:event_txtTotalActionPerformed
 
     private void prosesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prosesActionPerformed
-        // 1. Cek apakah tabel kosong
+       // Cek apakah ada item di tabel
         if (model.getRowCount() == 0) {
-            JOptionPane.showMessageDialog(this, "Belum ada barang yang discan!", "Transaksi Kosong", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Keranjang belanja kosong!", "Peringatan", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
-        // 2. Validasi Pembayaran
+        
         try {
-            // Ambil data angka dari TextFields
-            // Kita gunakan replace(",", "") jaga-jaga kalau ada format ribuan
-            double totalBelanja = Double.parseDouble(grandTotal.getText().replace(",", ""));
-            double uangBayar = 0;
-            
-            String cashText = cash.getText().trim();
-            if(!cashText.isEmpty()){
-                uangBayar = Double.parseDouble(cashText.replace(",", ""));
-            }
+            // Ambil semua data yang dibutuhkan
+            String invoiceNum = invoice.getText();
+            double total = Double.parseDouble(txtTotal.getText());
+            double discountVal = Double.parseDouble(discount.getText());
+            double grandTotalVal = Double.parseDouble(grandTotal.getText());
+            double cashVal = Double.parseDouble(cash.getText());
+            double changeVal = Double.parseDouble(change.getText());
 
-            // Cek apakah uang cukup
-            if (uangBayar < totalBelanja) {
-                JOptionPane.showMessageDialog(this, "Uang pembayaran kurang! \nTotal: " + totalBelanja + "\nBayar: " + uangBayar, "Gagal Bayar", JOptionPane.ERROR_MESSAGE);
+            // Validasi Cash
+            if (cashVal < grandTotalVal) {
+                JOptionPane.showMessageDialog(this, "Uang pembayaran (Cash) kurang!", "Validasi Pembayaran", JOptionPane.ERROR_MESSAGE);
                 return;
             }
             
-            // 3. Konfirmasi Transaksi
-            int confirm = JOptionPane.showConfirmDialog(this, "Proses transaksi ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
-            if (confirm != JOptionPane.YES_OPTION) {
-                return;
-            }
-
-            // 4. Siapkan Data untuk Controller
-            String noInvoice = invoice.getText();
-            // Ambil user ID yang sedang login (ambil dari object kasir di constructor)
-            // Jika user null (misal testing), pakai ID 1 (admin default)
-            int userId = (kasir != null && kasir.getId() > 0) ? kasir.getId() : 1; 
-            
-            double subtotalVal = Double.parseDouble(txtTotal.getText().replace(",", ""));
-            double discountVal = Double.parseDouble(discount.getText().replace(",", ""));
-            double changeVal = Double.parseDouble(change.getText().replace(",", ""));
-
-            // 5. PANGGIL CONTROLLER (Ini inti OOP-nya)
-            // Kita melempar tanggung jawab penyimpanan data ke Controller (Separation of Concerns)
-            boolean sukses = saleController.saveSale(
-                noInvoice, 
-                userId, 
-                subtotalVal, 
+            // Panggil Controller untuk menyimpan transaksi
+            String resultMessage = saleController.saveSale(
+                invoiceNum, 
+                kasir, 
+                total, 
                 discountVal, 
-                totalBelanja, // grandTotal
-                uangBayar, 
+                grandTotalVal, 
+                cashVal, 
                 changeVal, 
-                model // Kirim seluruh data tabel belanjaan
+                model // Kirimkan model tabel
             );
 
-            // 6. Respon Hasil
-            if (sukses) {
-                // Tanya mau cetak struk?
-                int cetak = JOptionPane.showConfirmDialog(this, "Transaksi Berhasil! \nApakah ingin mencetak struk?", "Sukses", JOptionPane.YES_NO_OPTION);
-                
-                if (cetak == JOptionPane.YES_OPTION) {
-                    // Panggil fungsi cetak di controller
-                    String namaUser = (kasir != null) ? kasir.getFullName() : "Admin";
-                    saleController.cetakStruk(noInvoice, namaUser);
-                }
-                
-                // Reset frame agar siap transaksi baru
-                resetFrame(); 
-                
-            } else {
-                JOptionPane.showMessageDialog(this, "Gagal menyimpan ke database.\nCek koneksi atau stok barang.", "Error Database", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, resultMessage);
+
+            // Jika transaksi sukses, reset form
+            if (resultMessage.contains("Sukses")) {
+                resetFrame();
             }
 
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "Format angka salah (Total/Cash/Diskon). \nPastikan hanya angka.", "Error Input", JOptionPane.WARNING_MESSAGE);
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Pastikan semua field Total, Diskon, dan Cash berisi angka yang valid.", "Input Tidak Valid", JOptionPane.ERROR_MESSAGE);
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Terjadi kesalahan: " + e.getMessage(), "System Error", JOptionPane.ERROR_MESSAGE);
+            System.err.println("Error saat memproses transaksi: " + e.getMessage());
             e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Terjadi kesalahan sistem saat menyimpan transaksi.", "Error Sistem", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_prosesActionPerformed
 
