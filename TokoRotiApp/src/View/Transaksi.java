@@ -48,10 +48,10 @@ public class Transaksi extends javax.swing.JFrame {
                 new String[]{"ID", "Nama", "Jumlah", "Harga", "Total"}
         );
 
-        // isi otomatis nama kasir dari SessionUser
-        String kasir = SessionUser.getNamaUser();
-        if (kasir != null && !kasir.isEmpty()) {
-            jTextField1.setText(kasir);
+        // *** TAMPILKAN NAMA KASIR DARI SESSION (fullname) ***
+        String namaKasir = SessionUser.getNamaUser(); // fullname yang diset waktu login
+        if (namaKasir != null && !namaKasir.isEmpty()) {
+            jTextField1.setText(namaKasir);
             jTextField1.setEditable(false);
         }
 
@@ -77,9 +77,6 @@ public class Transaksi extends javax.swing.JFrame {
         lblTotalBayar.setText(String.valueOf(total));
         return total;
     }
-
-
-
 
     private void Gambar(javax.swing.JLabel label, String resourcePath) {
         ImageIcon imgIco = new ImageIcon(
@@ -455,12 +452,13 @@ public class Transaksi extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         // 1. Validasi keranjang
+        // 1. Validasi keranjang
         if (tableTransaksiModel.getRowCount() == 0) {
             JOptionPane.showMessageDialog(this, "Keranjang masih kosong.");
             return;
         }
 
-        String kasir = jTextField1.getText().trim();
+        String kasir = jTextField1.getText().trim(); // ini cuma untuk tampilan / struk
         if (kasir.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Nama kasir belum diisi.");
             return;
@@ -495,18 +493,10 @@ public class Transaksi extends javax.swing.JFrame {
             conn = Koneksi.configDB();
             conn.setAutoCommit(false);
 
-            // 2. Cari user_id dari username (kasir)
-            int userId = 0;
-            String sqlUser = "SELECT user_id FROM users WHERE username = ? LIMIT 1";
-            try (PreparedStatement psUser = conn.prepareStatement(sqlUser)) {
-                psUser.setString(1, kasir);
-                try (ResultSet rsUser = psUser.executeQuery()) {
-                    if (rsUser.next()) {
-                        userId = rsUser.getInt("user_id");
-                    } else {
-                        throw new SQLException("User/kasir '" + kasir + "' tidak ditemukan di tabel users.");
-                    }
-                }
+            // 2. Ambil user_id langsung dari SessionUser (TIDAK QUERY LAGI KE users)
+            int userId = SessionUser.getUserId();
+            if (userId <= 0) {
+                throw new SQLException("User ID di SessionUser tidak valid. Silakan login ulang.");
             }
 
             // 3. Insert ke tabel transactions
@@ -518,7 +508,7 @@ public class Transaksi extends javax.swing.JFrame {
                 psTrx.setDouble(3, total);
                 psTrx.executeUpdate();
 
-                try (ResultSet rsKey = psTrx.getGeneratedKeys()) {
+                try (java.sql.ResultSet rsKey = psTrx.getGeneratedKeys()) {
                     if (rsKey.next()) {
                         idTransaksiBaru = rsKey.getInt(1);
                     } else {
