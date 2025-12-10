@@ -190,6 +190,7 @@ public class Home extends javax.swing.JFrame {
 
     private void jButton36ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton36ActionPerformed
         // TODO add your handling code here:
+        Logout.kembaliKeLogin(this);
     }//GEN-LAST:event_jButton36ActionPerformed
 
     /**

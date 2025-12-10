@@ -151,7 +151,7 @@ public class Transaksi extends javax.swing.JFrame {
         bttnKembali.setBackground(new java.awt.Color(79, 111, 128));
         bttnKembali.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
         bttnKembali.setForeground(new java.awt.Color(255, 255, 255));
-        bttnKembali.setText("Kembali");
+        bttnKembali.setText("Keluar");
         bttnKembali.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 bttnKembaliActionPerformed(evt);
@@ -419,9 +419,7 @@ public class Transaksi extends javax.swing.JFrame {
 
     private void bttnKembaliActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bttnKembaliActionPerformed
         // TODO add your handling code here:
-        AdminDashboard ad = new AdminDashboard();
-        ad.setVisible(true);
-        this.dispose();
+        Logout.kembaliKeLogin(this);
     }//GEN-LAST:event_bttnKembaliActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
