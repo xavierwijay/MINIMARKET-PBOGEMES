@@ -4,9 +4,27 @@
  */
 package View;
 
+import Config.Koneksi;
+import Controller.SessionUser;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
 import java.awt.Image;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -17,56 +35,57 @@ public class Transaksi extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Transaksi.class.getName());
 
-    /**
-     * Creates new form Transaksi
-     */
     public static DefaultTableModel tableTransaksiModel = new DefaultTableModel();
     private static Transaksi instance;
 
-public static Transaksi getInstance(){
-    if(instance == null){
-        instance = new Transaksi();
-    }
-    return instance;
-}
-
-    
     public Transaksi() {
         initComponents();
         Gambar(Logo, "/View/logo_besar.png");
+
+        // set model tabel transaksi
         tableTransaksi.setModel(tableTransaksiModel);
+        tableTransaksiModel.setColumnIdentifiers(
+                new String[]{"ID", "Nama", "Jumlah", "Harga", "Total"}
+        );
 
-    tableTransaksiModel.setColumnIdentifiers(
-            new String[]{"ID","Nama","Jumlah","Harga","Total"}
-    );
-        
-    }
-public int hitungTotal(){
-    int total = 0;
-    DefaultTableModel model = (DefaultTableModel) tableTransaksi.getModel();
-
-    for(int i = 0; i < model.getRowCount(); i++){
-        Object obj = model.getValueAt(i, 4); // kolom TOTAL
-
-        if(obj == null){
-            continue;
+        // isi otomatis nama kasir dari SessionUser
+        String kasir = SessionUser.getNamaUser();
+        if (kasir != null && !kasir.isEmpty()) {
+            jTextField1.setText(kasir);
+            jTextField1.setEditable(false);
         }
 
-        double subtotal = Double.parseDouble(obj.toString());
-        total += subtotal;
+        // tanggal otomatis hari ini
+        jDateChooser1.setDate(new Date());
+
+        // tampilkan total awal
+        hitungTotal();
+    }
+    
+    public double hitungTotal() {
+        double total = 0.0;
+        DefaultTableModel model = (DefaultTableModel) tableTransaksi.getModel();
+
+        for (int i = 0; i < model.getRowCount(); i++) {
+            Object obj = model.getValueAt(i, 4); // kolom TOTAL
+            if (obj == null) continue;
+
+            double subtotal = Double.parseDouble(obj.toString());
+            total += subtotal;
+        }
+
+        lblTotalBayar.setText(String.valueOf(total));
+        return total;
     }
 
-    lblTotalBayar.setText(String.valueOf(total)); // <- UPDATE LABEL
-    return total;
-}
 
 
 
-        private void Gambar(javax.swing.JLabel label, String resourcePath) {
+    private void Gambar(javax.swing.JLabel label, String resourcePath) {
         ImageIcon imgIco = new ImageIcon(
-            getClass().getResource(resourcePath)
+                getClass().getResource(resourcePath)
         );
-        
+
         Image image = imgIco.getImage().getScaledInstance(
                 label.getWidth(),
                 label.getHeight(),
@@ -75,17 +94,17 @@ public int hitungTotal(){
 
         label.setIcon(new ImageIcon(image));
     }
-        public void addToCart(String id, String nama, int jumlah, double harga){
+
+    public void addToCart(String id, String nama, int jumlah, double harga) {
         double total = jumlah * harga;
 
         DefaultTableModel model = (DefaultTableModel) tableTransaksi.getModel();
-
         model.addRow(new Object[]{
-        id, nama, jumlah, harga, total
+            id, nama, jumlah, harga, total
         });
-        hitungTotal();
-}
 
+        hitungTotal();
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -185,6 +204,11 @@ public int hitungTotal(){
         jButton2.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
         jButton2.setForeground(new java.awt.Color(255, 255, 255));
         jButton2.setText("Cetak Struk");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setBackground(new java.awt.Color(181, 85, 104));
         jButton3.setFont(new java.awt.Font("Segoe UI Black", 1, 14)); // NOI18N
@@ -273,15 +297,14 @@ public int hitungTotal(){
                                 .addComponent(jButton5)
                                 .addGap(18, 18, 18)
                                 .addComponent(bttnKembali))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
-                                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(lblTotalBayar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
-                                    .addComponent(jLabel4)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE))))))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+                                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(lblTotalBayar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap(88, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -430,6 +453,193 @@ public int hitungTotal(){
             );
         }
     }//GEN-LAST:event_btnPilihActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        // 1. Validasi keranjang
+        if (tableTransaksiModel.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "Keranjang masih kosong.");
+            return;
+        }
+
+        String kasir = jTextField1.getText().trim();
+        if (kasir.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Nama kasir belum diisi.");
+            return;
+        }
+
+        Date tanggal = jDateChooser1.getDate();
+        if (tanggal == null) {
+            tanggal = new Date();
+        }
+
+        String metode = (String) jComboBox1.getSelectedItem();
+        double total = hitungTotal();
+
+        String uangUserStr = jTextField3.getText().trim();
+        double uangUser = 0;
+        if (!uangUserStr.isEmpty()) {
+            try {
+                uangUser = Double.parseDouble(uangUserStr);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Format uang user tidak valid.");
+                return;
+            }
+            if (uangUser < total) {
+                JOptionPane.showMessageDialog(this, "Uang user kurang dari total.");
+                return;
+            }
+        }
+
+        Connection conn = null;
+
+        try {
+            conn = Koneksi.configDB();
+            conn.setAutoCommit(false);
+
+            // 2. Cari user_id dari username (kasir)
+            int userId = 0;
+            String sqlUser = "SELECT user_id FROM users WHERE username = ? LIMIT 1";
+            try (PreparedStatement psUser = conn.prepareStatement(sqlUser)) {
+                psUser.setString(1, kasir);
+                try (ResultSet rsUser = psUser.executeQuery()) {
+                    if (rsUser.next()) {
+                        userId = rsUser.getInt("user_id");
+                    } else {
+                        throw new SQLException("User/kasir '" + kasir + "' tidak ditemukan di tabel users.");
+                    }
+                }
+            }
+
+            // 3. Insert ke tabel transactions
+            int idTransaksiBaru;
+            String sqlTrx = "INSERT INTO transactions (user_id, transaction_date, total_amount) VALUES (?, ?, ?)";
+            try (PreparedStatement psTrx = conn.prepareStatement(sqlTrx, Statement.RETURN_GENERATED_KEYS)) {
+                psTrx.setInt(1, userId);
+                psTrx.setTimestamp(2, new Timestamp(tanggal.getTime()));
+                psTrx.setDouble(3, total);
+                psTrx.executeUpdate();
+
+                try (ResultSet rsKey = psTrx.getGeneratedKeys()) {
+                    if (rsKey.next()) {
+                        idTransaksiBaru = rsKey.getInt(1);
+                    } else {
+                        throw new SQLException("Gagal mendapatkan ID transaksi baru.");
+                    }
+                }
+            }
+
+            // 4. Insert ke tabel transaction_details
+            String sqlDet = "INSERT INTO transaction_details (transaction_id, product_id, quantity, subtotal) " +
+                            "VALUES (?, ?, ?, ?)";
+            try (PreparedStatement psDet = conn.prepareStatement(sqlDet)) {
+                for (int i = 0; i < tableTransaksiModel.getRowCount(); i++) {
+                    int productId = Integer.parseInt(tableTransaksiModel.getValueAt(i, 0).toString());
+                    int qty       = Integer.parseInt(tableTransaksiModel.getValueAt(i, 2).toString());
+                    double sub    = Double.parseDouble(tableTransaksiModel.getValueAt(i, 4).toString());
+
+                    psDet.setInt(1, idTransaksiBaru);
+                    psDet.setInt(2, productId);
+                    psDet.setInt(3, qty);
+                    psDet.setDouble(4, sub);
+                    psDet.addBatch();
+                }
+                psDet.executeBatch();
+            }
+
+            conn.commit();
+
+            // 5. Buat PDF struk dengan iText
+            buatPdfStruk(idTransaksiBaru, kasir, tanggal, metode, total, uangUser);
+
+            JOptionPane.showMessageDialog(this,
+                    "Transaksi berhasil disimpan dan struk PDF dibuat.",
+                    "Info",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            // 6. Bersihkan form
+            tableTransaksiModel.setRowCount(0);
+            hitungTotal();
+            jTextField3.setText("");
+
+        } catch (Exception ex) {
+            if (conn != null) {
+                try { conn.rollback(); } catch (SQLException e1) { /* ignore */ }
+            }
+            logger.log(java.util.logging.Level.SEVERE, "Gagal menyimpan transaksi / membuat struk", ex);
+            JOptionPane.showMessageDialog(this,
+                    "Gagal menyimpan transaksi / membuat struk:\n" + ex.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException e1) { /* ignore */ }
+            }
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void buatPdfStruk(int idTransaksi, String kasir, Date tanggal,
+        String metode, double total, double uangUser) throws Exception {
+
+        // 3. Siapkan file PDF tujuan
+        SimpleDateFormat sdfFile = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String timeStamp = sdfFile.format(new Date());
+
+        File folder = new File(System.getProperty("user.home"), "Struk_TokoRoti");
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+
+        File pdfFile = new File(folder, "struk_" + timeStamp + ".pdf");
+
+        // 4. Buat PDF dengan iText
+        SimpleDateFormat sdfTgl = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+
+        Document doc = new Document();
+        PdfWriter.getInstance(doc, new FileOutputStream(pdfFile));
+
+        doc.open();
+        doc.add(new Paragraph("Toko Roti SANDX"));
+        doc.add(new Paragraph("ID Transaksi : " + idTransaksi));
+        doc.add(new Paragraph("Kasir        : " + kasir));
+        doc.add(new Paragraph("Tanggal      : " + sdfTgl.format(tanggal)));
+        doc.add(new Paragraph("Metode Bayar : " + (metode == null ? "-" : metode)));
+        doc.add(new Paragraph(" "));
+
+        PdfPTable pdfTable = new PdfPTable(5);
+        pdfTable.setWidthPercentage(100);
+        pdfTable.addCell("No");
+        pdfTable.addCell("Nama");
+        pdfTable.addCell("Qty");
+        pdfTable.addCell("Harga");
+        pdfTable.addCell("Total");
+
+        for (int i = 0; i < tableTransaksiModel.getRowCount(); i++) {
+            pdfTable.addCell(String.valueOf(i + 1));
+            pdfTable.addCell(String.valueOf(tableTransaksiModel.getValueAt(i, 1)));
+            pdfTable.addCell(String.valueOf(tableTransaksiModel.getValueAt(i, 2)));
+            pdfTable.addCell(String.valueOf(tableTransaksiModel.getValueAt(i, 3)));
+            pdfTable.addCell(String.valueOf(tableTransaksiModel.getValueAt(i, 4)));
+        }
+
+        doc.add(pdfTable);
+        doc.add(new Paragraph(" "));
+        doc.add(new Paragraph("TOTAL   : " + total));
+        if (uangUser > 0) {
+            doc.add(new Paragraph("BAYAR   : " + uangUser));
+            doc.add(new Paragraph("KEMBALI : " + (uangUser - total)));
+        }
+
+        doc.close();
+
+        JOptionPane.showMessageDialog(this,
+                "Struk tersimpan di:\n" + pdfFile.getAbsolutePath(),
+                "Struk PDF",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
 
     /**
      * @param args the command line arguments

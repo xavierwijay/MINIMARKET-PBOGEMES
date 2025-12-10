@@ -191,6 +191,9 @@ public class AdminDashboard extends javax.swing.JFrame {
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
         // TODO add your handling code here:
+        KelolaPesananAdmin kpa = new KelolaPesananAdmin();
+        kpa.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_jButton10ActionPerformed
 
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
@@ -204,7 +207,7 @@ public class AdminDashboard extends javax.swing.JFrame {
         // TODO add your handling code here:
         TambahKasir tk = new TambahKasir();    
         tk.setVisible(true);
-    this.dispose(); 
+        this.dispose(); 
     }//GEN-LAST:event_jButton12ActionPerformed
 
     /**

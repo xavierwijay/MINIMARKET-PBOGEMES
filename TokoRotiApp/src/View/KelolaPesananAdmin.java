@@ -1,10 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package View;
 
+import Config.Koneksi;
 import java.awt.Image;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -14,35 +15,36 @@ import javax.swing.table.DefaultTableModel;
  * @author LENOVO
  */
 public class KelolaPesananAdmin extends javax.swing.JFrame {
-    
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(KelolaPesananAdmin.class.getName());
+
+    private static final java.util.logging.Logger logger =
+            java.util.logging.Logger.getLogger(KelolaPesananAdmin.class.getName());
+
+    // model tabel
+    private DefaultTableModel modelTransaksi;
+    private DefaultTableModel modelDetail;
 
     /**
      * Creates new form KelolaPesananAdmin
      */
-    private DefaultTableModel modelTransaksi;
-    private DefaultTableModel modelDetail;
     public KelolaPesananAdmin() {
         initComponents();
-        GambarLogo(Logo, "/View/logo_besar.png");  
+        GambarLogo(Logo, "/View/logo_besar.png");
 
         // sembunyikan komponen yang tidak dipakai:
         // tanggal, nama pemesan, total harga, metode pembayaran
         jLabel2.setVisible(false);
         jLabel3.setVisible(false);
-        jLabel5.setVisible(false);
         jLabel4.setVisible(false);
+        jLabel5.setVisible(false);
         jTextField2.setVisible(false);
         jTextField3.setVisible(false);
         jComboBox1.setVisible(false);
+        // jButton1 = tombol HAPUS -> jangan disembunyikan
 
-        // ubah tombol jadi HAPUS TRANSAKSI
-        jButton1.setText("Hapus Transaksi");
-        jButton1.addActionListener(evt -> hapusTransaksiTerpilih());
-
-        // inisialisasi tabel
+        // inisialisasi model tabel
         initTableModels();
-        // isi data transaksi dari database (kamu sambungkan sendiri)
+
+        // isi data transaksi dari database
         loadDataTransaksi();
 
         // ketika pilih transaksi di tabel atas, tampilkan detail di tabel bawah
@@ -52,67 +54,200 @@ public class KelolaPesananAdmin extends javax.swing.JFrame {
             }
         });
     }
-    
-private void hapusTransaksiTerpilih() {
-    int row = jTable1.getSelectedRow();
-    if (row == -1) {
-        JOptionPane.showMessageDialog(this, "Pilih transaksi dulu.");
-        return;
+
+    // ===================== UTIL LOGO =====================
+    private void GambarLogo(javax.swing.JLabel label, String resourcePath) {
+        ImageIcon imgIco = new ImageIcon(getClass().getResource(resourcePath));
+        Image image = imgIco.getImage().getScaledInstance(
+                label.getWidth(),
+                label.getHeight(),
+                Image.SCALE_SMOOTH
+        );
+        label.setIcon(new ImageIcon(image));
     }
 
-    int konfirmasi = JOptionPane.showConfirmDialog(
-            this,
-            "Yakin ingin menghapus transaksi ini beserta semua detailnya?",
-            "Konfirmasi",
-            JOptionPane.YES_NO_OPTION
-    );
+    // ===================== TABLE MODEL =====================
+    private void initTableModels() {
+        // tabel transaksi (atas)
+        modelTransaksi = new DefaultTableModel(
+                new Object[]{"ID", "Tanggal", "Kasir", "Total", "Metode"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // tidak bisa diedit langsung dari tabel
+            }
+        };
+        jTable1.setModel(modelTransaksi);
 
-    if (konfirmasi != JOptionPane.YES_OPTION) {
-        return;
+        // tabel detail transaksi (bawah)
+        modelDetail = new DefaultTableModel(
+                new Object[]{"Nama Produk", "Qty", "Harga", "Sub Total"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        jTable2.setModel(modelDetail);
     }
 
-    int idTransaksi = (int) modelTransaksi.getValueAt(row, 0);
+    // ===================== LOAD DATA HEADER TRANSAKSI =====================
+    private void loadDataTransaksi() {
+        // bersihkan tabel dulu
+        modelTransaksi.setRowCount(0);
 
-    Connection conn = null;
-    try {
-        conn = Koneksi.configDB();
-        conn.setAutoCommit(false);
+        String sql =
+            "SELECT t.transaction_id, " +
+            "       t.transaction_date, " +          // kolom di tabel transactions
+            "       u.fullname AS kasir, " +         // kolom di tabel users
+            "       t.total_amount, " +              // kolom di tabel transactions
+            "       t.payment_method " +             // kolom di tabel transactions
+            "FROM transactions t " +
+            "JOIN users u ON t.user_id = u.user_id " +  // <<< PERBAIKAN DI SINI
+            "ORDER BY t.transaction_date DESC";
 
-        // hapus detail dulu
-        try (PreparedStatement psDet = conn.prepareStatement(
-                "DELETE FROM transaction_details WHERE transaction_id = ?")) {
-            psDet.setInt(1, idTransaksi);
-            psDet.executeUpdate();
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy");
+
+        try (Connection conn = Koneksi.configDB();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                int idTransaksi = rs.getInt("transaction_id");
+
+                java.sql.Date tglSql = rs.getDate("transaction_date");
+                String tgl = (tglSql != null) ? sdf.format(tglSql) : "-";
+
+                String kasir  = rs.getString("kasir");
+                double total  = rs.getDouble("total_amount");
+                String metode = rs.getString("payment_method");
+
+                // urutannya harus sama dengan definisi kolom modelTransaksi:
+                // new Object[]{"ID", "Tanggal", "Kasir", "Total", "Metode"}
+                modelTransaksi.addRow(new Object[]{
+                    idTransaksi, tgl, kasir, total, metode
+                });
+            }
+        } catch (SQLException ex) {
+            logger.log(java.util.logging.Level.SEVERE, "Gagal load data transaksi", ex);
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Gagal mengambil data transaksi dari database:\n" + ex.getMessage()
+            );
+        }
+    }
+
+    // ===================== HAPUS TRANSAKSI =====================
+    private void hapusTransaksiTerpilih() {
+        int row = jTable1.getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Pilih transaksi dulu.");
+            return;
         }
 
-        // hapus header transaksi
-        try (PreparedStatement psTrx = conn.prepareStatement(
-                "DELETE FROM transactions WHERE transaction_id = ?")) {
-            psTrx.setInt(1, idTransaksi);
-            psTrx.executeUpdate();
+        int konfirmasi = JOptionPane.showConfirmDialog(
+                this,
+                "Yakin ingin menghapus transaksi ini beserta semua detailnya?",
+                "Konfirmasi",
+                JOptionPane.YES_NO_OPTION
+        );
+        if (konfirmasi != JOptionPane.YES_OPTION) {
+            return;
         }
 
-        conn.commit();
+        int idTransaksi = (int) modelTransaksi.getValueAt(row, 0);
+        Connection conn = null;
 
-        // hapus dari tabel tampilan
-        modelTransaksi.removeRow(row);
+        try {
+            conn = Koneksi.configDB();
+            conn.setAutoCommit(false);
+
+            // hapus detail dulu
+            try (PreparedStatement psDet = conn.prepareStatement(
+                    "DELETE FROM transaction_details WHERE transaction_id = ?")) {
+                psDet.setInt(1, idTransaksi);
+                psDet.executeUpdate();
+            }
+
+            // hapus header transaksi
+            try (PreparedStatement psTrx = conn.prepareStatement(
+                    "DELETE FROM transactions WHERE transaction_id = ?")) {
+                psTrx.setInt(1, idTransaksi);
+                psTrx.executeUpdate();
+            }
+
+            conn.commit();
+
+            // hapus dari tabel tampilan
+            modelTransaksi.removeRow(row);
+            modelDetail.setRowCount(0);
+
+            JOptionPane.showMessageDialog(this, "Transaksi berhasil dihapus.");
+        } catch (SQLException ex) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException e1) {
+                    // ignore
+                }
+            }
+            logger.log(java.util.logging.Level.SEVERE, "Gagal menghapus transaksi", ex);
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Gagal menghapus transaksi dari database:\n" + ex.getMessage()
+            );
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                } catch (SQLException e1) {
+                    // ignore
+                }
+            }
+        }
+    }
+
+    // ===================== LOAD DETAIL TRANSAKSI =====================
+    private void tampilkanDetailTransaksiTerpilih() {
+        int row = jTable1.getSelectedRow();
+        if (row == -1) {
+            modelDetail.setRowCount(0);
+            return;
+        }
+
+        int idTransaksi = (int) modelTransaksi.getValueAt(row, 0);
         modelDetail.setRowCount(0);
 
-        JOptionPane.showMessageDialog(this, "Transaksi berhasil dihapus.");
-    } catch (SQLException ex) {
-        if (conn != null) {
-            try { conn.rollback(); } catch (SQLException e1) { /* ignore */ }
-        }
-        logger.log(java.util.logging.Level.SEVERE, "Gagal menghapus transaksi", ex);
-        JOptionPane.showMessageDialog(this,
-                "Gagal menghapus transaksi dari database:\n" + ex.getMessage());
-    } finally {
-        if (conn != null) {
-            try { conn.setAutoCommit(true); } catch (SQLException e1) { /* ignore */ }
+        String sql =
+            "SELECT m.name AS product_name, " +
+            "       d.quantity, " +
+            "       m.price, " +
+            "       d.subtotal " +
+            "FROM transaction_details d " +
+            "JOIN tbmakanan m ON d.product_id = m.id_makanan " +
+            "WHERE d.transaction_id = ?";
+
+        try (Connection conn = Koneksi.configDB();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, idTransaksi);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    modelDetail.addRow(new Object[]{
+                        rs.getString("product_name"),
+                        rs.getInt("quantity"),
+                        rs.getDouble("price"),
+                        rs.getDouble("subtotal")
+                    });
+                }
+            }
+        } catch (SQLException ex) {
+            logger.log(java.util.logging.Level.SEVERE, "Gagal load detail transaksi", ex);
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Gagal mengambil detail transaksi:\n" + ex.getMessage()
+            );
         }
     }
-}
-
 
     /**
      * This method is called from within the constructor to initialize the form.

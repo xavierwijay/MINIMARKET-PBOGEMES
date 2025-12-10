@@ -267,8 +267,8 @@ public void refreshTable() throws SQLException {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
-        new View.Transaksi().setVisible(true);
-        this.setVisible(false);
+        this.dispose();
+        new Transaksi().setVisible(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void tableMakanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMakanMouseClicked
@@ -295,71 +295,72 @@ public void refreshTable() throws SQLException {
             double harga = Double.parseDouble(lblHarga.getText());
             int jml = Integer.parseInt(spinnerJumlah.getValue().toString());
             
-MakananController mc = new MakananController();
+            MakananController mc = new MakananController();
 
-// Jika stok gagal diupdate → JANGAN LANJUT
-boolean sukses = mc.updateStock(id, jml);
+            // Jika stok gagal diupdate → JANGAN LANJUT
+            boolean sukses = mc.updateStock(id, jml);
 
-if (!sukses) {
-    return; // ⛔ STOP! Jangan tambah ke transaksi
-}
+            if (!sukses) {
+                return; // ⛔ STOP! Jangan tambah ke transaksi
+            }
 
-refreshTable();
-// VALIDASI
-if(jml <= 0){
-    javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus lebih dari 0!");
-    return;   // <-- wajib
-}
+            refreshTable();
+            // VALIDASI
+            if(jml <= 0){
+                javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus lebih dari 0!");
+                return;   // <-- wajib
+            }
 
-DefaultTableModel model = Transaksi.tableTransaksiModel;
+            DefaultTableModel model = Transaksi.tableTransaksiModel;
 
-boolean found = false;
+            boolean found = false;
 
-for (int i = 0; i < model.getRowCount(); i++) {
+            for (int i = 0; i < model.getRowCount(); i++) {
 
-    int idExisting = Integer.parseInt(model.getValueAt(i, 0).toString());
+                int idExisting = Integer.parseInt(model.getValueAt(i, 0).toString());
 
-    if (idExisting == id) {
+                if (idExisting == id) {
 
-        int jumlahExisting = Integer.parseInt(model.getValueAt(i, 2).toString());
-        
-        int jumlahBaru = jumlahExisting + jml;
+                    int jumlahExisting = Integer.parseInt(model.getValueAt(i, 2).toString());
 
-        model.setValueAt(jumlahBaru, i, 2);
+                    int jumlahBaru = jumlahExisting + jml;
 
-        // update total kolom 4
-        double subtotal = jumlahBaru * harga;
-        model.setValueAt(subtotal, i, 4);
+                    model.setValueAt(jumlahBaru, i, 2);
 
-        found = true;
-        break;
-    }
-}
+                    // update total kolom 4
+                    double subtotal = jumlahBaru * harga;
+                    model.setValueAt(subtotal, i, 4);
 
-if (!found) {
+                    found = true;
+                    break;
+                }
+            }
 
-    double subtotal = harga * jml;
+            if (!found) {
 
-    Object[] row = {
-        id,
-        nama,
-        jml,
-        harga,
-        subtotal
-    };
+                double subtotal = harga * jml;
 
-    model.addRow(row);
-}
+                Object[] row = {
+                    id,
+                    nama,
+                    jml,
+                    harga,
+                    subtotal
+                };
 
-// **JANGAN bikin Transaksi baru**
-this.setVisible(false);
+                model.addRow(row);
+            }
 
-// update total di instance yang sudah ada
-Transaksi.getInstance().hitungTotal();
-Transaksi.getInstance().setVisible(true);
-        } catch (SQLException ex) {
-            System.getLogger(PilihMenu.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
-        }
+            // **JANGAN bikin Transaksi baru**
+            this.dispose();
+
+            // update total di instance yang sudah ada
+                    Transaksi tr = new Transaksi();
+                    tr.setVisible(true);
+                    tr.hitungTotal();
+                    } catch (SQLException ex) {
+                        System.getLogger(PilihMenu.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+                    }
 
     }//GEN-LAST:event_jButton1ActionPerformed
     
