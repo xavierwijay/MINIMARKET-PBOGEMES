@@ -73,11 +73,10 @@ public class KueKering extends javax.swing.JFrame {
     wrapper.setOpaque(false);
     //                top, left, bottom, right
     wrapper.setBorder(javax.swing.BorderFactory.createEmptyBorder(20, 60, 20, 80));
-    //                                      ↑
-    //  right = 80 -> jarak kanan sedikit lebih besar (biar ada sela dengan scrollbar)
+   
     wrapper.add(grid, java.awt.BorderLayout.CENTER);
 
-    // ================== SCROLLPANE ==================
+  
     javax.swing.JScrollPane scroll = new javax.swing.JScrollPane(wrapper);
     scroll.setBorder(null);
     scroll.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -97,10 +96,10 @@ public class KueKering extends javax.swing.JFrame {
    private javax.swing.JPanel buatCardProduk(Product p) {
     javax.swing.JPanel card = new javax.swing.JPanel(new java.awt.BorderLayout());
     card.setBackground(java.awt.Color.WHITE);
-    card.setPreferredSize(new java.awt.Dimension(210, 280));
-    card.setMaximumSize(new java.awt.Dimension(210, 280));
+    card.setPreferredSize(new java.awt.Dimension(210, 300));
+    card.setMaximumSize(new java.awt.Dimension(210, 300));
 
-    // ================== BAGIAN ATAS : GAMBAR ==================
+    
     javax.swing.JLabel img = new javax.swing.JLabel();
     img.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
     img.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
@@ -132,7 +131,7 @@ public class KueKering extends javax.swing.JFrame {
     imgWrap.add(img, java.awt.BorderLayout.CENTER);
     card.add(imgWrap, java.awt.BorderLayout.NORTH);
 
-    // ================== BAGIAN TENGAH : NAMA, HARGA, JUMLAH ==================
+    
     javax.swing.JPanel middle = new javax.swing.JPanel();
     middle.setOpaque(false);
     middle.setLayout(new javax.swing.BoxLayout(middle, javax.swing.BoxLayout.Y_AXIS));
@@ -148,8 +147,11 @@ public class KueKering extends javax.swing.JFrame {
     harga.setForeground(new java.awt.Color(158, 115, 52));
     harga.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
     harga.setAlignmentX(0.0f);
-
-    // Row "Jumlah" + spinner (rata kiri)
+    
+    JLabel stokLabel = new JLabel("Stok: " + p.getStock());
+    stokLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    
+ 
     javax.swing.JPanel qtyRow = new javax.swing.JPanel(
             new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0)
     );
@@ -166,6 +168,8 @@ public class KueKering extends javax.swing.JFrame {
     middle.add(nama);
     middle.add(javax.swing.Box.createVerticalStrut(2));
     middle.add(harga);
+    middle.add(Box.createVerticalStrut(2));
+    middle.add(stokLabel);
     middle.add(javax.swing.Box.createVerticalStrut(6));
     middle.add(qtyRow);
 
@@ -178,12 +182,57 @@ public class KueKering extends javax.swing.JFrame {
     btn.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
 
     btn.addActionListener(e -> {
-        int jumlah = (Integer) sp.getValue();
+         int jumlah = (Integer) sp.getValue();
+
+        // 1. Jumlah harus > 0
         if (jumlah <= 0) {
             javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
             return;
         }
-        KeranjangController.getInstance().tambahItem(p, jumlah);
+
+        ProductController pc = new ProductController();
+
+        // 2. Ambil stok terbaru dari DB
+        Model.Product current = pc.ambilById(p.getId());
+        if (current == null) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Produk sudah tidak ada di database");
+            return;
+        }
+
+        // 3. Cek stok cukup
+        if (jumlah > current.getStock()) {
+            javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "Stok tidak cukup! Tersedia: " + current.getStock()
+            );
+            return;
+        }
+
+        // 4. Kurangi stok di DB (tidak boleh minus)
+        boolean ok = pc.kurangiStok(current.getId(), jumlah);
+        if (!ok) {
+            javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "Stok baru saja berubah, silakan coba lagi"
+            );
+            return;
+        }
+
+        // 5. Tambah ke keranjang
+        KeranjangController.getInstance().tambahItem(current, jumlah);
+
+        // 6. Ambil stok terbaru lagi & update label di UI
+        Model.Product after = pc.ambilById(current.getId());
+        if (after != null) {
+            stokLabel.setText("Stok: " + after.getStock());
+
+            // kalau sudah habis, sembunyikan card dari katalog
+            if (after.getStock() <= 0) {
+                card.setVisible(false);
+            }
+        }
+
         javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
         sp.setValue(0);
     });
@@ -192,6 +241,7 @@ public class KueKering extends javax.swing.JFrame {
     bottom.setOpaque(false);
     bottom.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 0, 10, 0));
     bottom.add(btn);
+
     card.add(bottom, java.awt.BorderLayout.SOUTH);
 
     return card;

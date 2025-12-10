@@ -12,8 +12,7 @@ import java.text.DecimalFormat;
 
 public class Bolu extends javax.swing.JFrame {
 
-    private static final java.util.logging.Logger logger =
-        java.util.logging.Logger.getLogger(Bolu.class.getName());
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Bolu.class.getName());
     private final ProductController productController = new ProductController();
 
     public Bolu() {
@@ -83,7 +82,7 @@ public class Bolu extends javax.swing.JFrame {
     private JPanel buatCardProduk(Product p) {
         JPanel card = new JPanel(new BorderLayout());
         card.setBackground(Color.WHITE);
-        card.setPreferredSize(new Dimension(210, 280));
+        card.setPreferredSize(new Dimension(210, 300));
         
 
         // === GAMBAR PRODUK ===
@@ -121,6 +120,9 @@ public class Bolu extends javax.swing.JFrame {
         JLabel harga = new JLabel("Rp. " + formatRupiah(p.getPrice()));
         harga.setForeground(new Color(158, 115, 52));
         harga.setAlignmentX(Component.LEFT_ALIGNMENT);
+        
+        JLabel stokLabel = new JLabel("Stok: " + p.getStock());
+        stokLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JPanel qtyRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         qtyRow.setOpaque(false);
@@ -133,6 +135,8 @@ public class Bolu extends javax.swing.JFrame {
         middle.add(nama);
         middle.add(Box.createVerticalStrut(2));
         middle.add(harga);
+        middle.add(javax.swing.Box.createVerticalStrut(2));
+        middle.add(stokLabel);     
         middle.add(Box.createVerticalStrut(6));
         middle.add(qtyRow);
         card.add(middle, BorderLayout.CENTER);
@@ -145,23 +149,69 @@ public class Bolu extends javax.swing.JFrame {
 
         btn.addActionListener(e -> {
             int jumlah = (Integer) sp.getValue();
-            if (jumlah <= 0) {
-                JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
-                return;
+
+        // 1. Jumlah harus > 0
+        if (jumlah <= 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
+            return;
+        }
+
+        ProductController pc = new ProductController();
+
+        // 2. Ambil stok terbaru dari DB
+        Model.Product current = pc.ambilById(p.getId());
+        if (current == null) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Produk sudah tidak ada di database");
+            return;
+        }
+
+        // 3. Cek stok cukup
+        if (jumlah > current.getStock()) {
+            javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "Stok tidak cukup! Tersedia: " + current.getStock()
+            );
+            return;
+        }
+
+        // 4. Kurangi stok di DB (tidak boleh minus)
+        boolean ok = pc.kurangiStok(current.getId(), jumlah);
+        if (!ok) {
+            javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "Stok baru saja berubah, silakan coba lagi"
+            );
+            return;
+        }
+
+        // 5. Tambah ke keranjang
+        KeranjangController.getInstance().tambahItem(current, jumlah);
+
+        // 6. Ambil stok terbaru lagi & update label di UI
+        Model.Product after = pc.ambilById(current.getId());
+        if (after != null) {
+            stokLabel.setText("Stok: " + after.getStock());
+
+            // kalau sudah habis, sembunyikan card dari katalog
+            if (after.getStock() <= 0) {
+                card.setVisible(false);
             }
-            KeranjangController.getInstance().tambahItem(p, jumlah);
-            JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
-            sp.setValue(0);
-        });
+        }
 
-        JPanel bottom = new JPanel();
-        bottom.setOpaque(false);
-        bottom.setBorder(BorderFactory.createEmptyBorder(8, 0, 10, 0));
-        bottom.add(btn);
-        card.add(bottom, BorderLayout.SOUTH);
+        javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
+        sp.setValue(0);
+    });
 
-        return card;
-    }
+    javax.swing.JPanel bottom = new javax.swing.JPanel();
+    bottom.setOpaque(false);
+    bottom.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 0, 10, 0));
+    bottom.add(btn);
+
+    card.add(bottom, java.awt.BorderLayout.SOUTH);
+
+    return card;
+}
 
     private File resolveImageFile(String imagePath) {
         if (imagePath == null || imagePath.isBlank()) return null;

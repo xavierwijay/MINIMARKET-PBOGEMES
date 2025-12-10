@@ -7,7 +7,15 @@ package View;
 import Controller.KeranjangController;
 import Controller.ProductController;
 import Model.Product;
+import java.awt.Component;
+import java.awt.Font;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -15,8 +23,7 @@ import javax.swing.JOptionPane;
  */
 public class KueUlangTahun extends javax.swing.JFrame {
 
-    private static final java.util.logging.Logger logger =
-        java.util.logging.Logger.getLogger(KueUlangTahun.class.getName());
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(KueUlangTahun.class.getName());
     private final ProductController productController = new ProductController();
 
     
@@ -24,11 +31,12 @@ public class KueUlangTahun extends javax.swing.JFrame {
         initComponents();  // panggil komponen bawaan NetBeans
         setupDynamicLayout(); // isi panel produk (pnlDynamic)
     }
+    
+    
 
     private void setupDynamicLayout() {
         // Ambil data produk dari kategori KUE ULANG TAHUN
-        java.util.List<Model.Product> items =
-                productController.ambilByKategori("KUE ULANG TAHUN");
+        java.util.List<Model.Product> items =productController.ambilByKategori("KUE ULANG TAHUN");
 
         // Bersihkan isi lama panel
         pnlDynamic.removeAll();
@@ -39,8 +47,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
         pnlDynamic.setLayout(new java.awt.BorderLayout());
 
         // === GRID PRODUK ===
-        javax.swing.JPanel grid =
-                new javax.swing.JPanel(new java.awt.GridLayout(0, 4, 25, 25));
+        javax.swing.JPanel grid = new javax.swing.JPanel(new java.awt.GridLayout(0, 4, 25, 25));
         grid.setOpaque(false);
         for (Model.Product p : items) {
             grid.add(buatCardProduk(p));
@@ -78,9 +85,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
         pnlDynamic.repaint();
     }
 
-    // =========================
     //  RESOLVER GAMBAR
-    // =========================
     private java.io.File resolveImageFile(String imagePath) {
         if (imagePath == null || imagePath.isBlank()) return null;
 
@@ -101,21 +106,21 @@ public class KueUlangTahun extends javax.swing.JFrame {
         return null;
     }
 
-    // =========================
+    
     //  CARD PRODUK
-    // =========================
+
     private javax.swing.JPanel buatCardProduk(Model.Product p) {
         javax.swing.JPanel card = new javax.swing.JPanel(new java.awt.BorderLayout());
         card.setBackground(java.awt.Color.WHITE);
-        card.setPreferredSize(new java.awt.Dimension(210, 280));
-        card.setMaximumSize(new java.awt.Dimension(210, 280));
+        card.setPreferredSize(new java.awt.Dimension(210, 300));
+        card.setMaximumSize(new java.awt.Dimension(210, 300));
 
         // --------- ATAS: GAMBAR ----------
         javax.swing.JLabel img = new javax.swing.JLabel();
         img.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         img.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
 
-        int targetW = 170;
+        int targetW = 150;
         int targetH = 140;
 
         java.io.File f = resolveImageFile(p.getImagePath());
@@ -156,10 +161,12 @@ public class KueUlangTahun extends javax.swing.JFrame {
         harga.setForeground(new java.awt.Color(158, 115, 52));
         harga.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
         harga.setAlignmentX(0.0f);
+        
+        JLabel stokLabel = new JLabel("Stok: " + p.getStock());
+        stokLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         javax.swing.JPanel qtyRow = new javax.swing.JPanel(
-                new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0)
-        );
+                new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0) );
         qtyRow.setOpaque(false);
         qtyRow.setAlignmentX(0.0f);
 
@@ -167,12 +174,16 @@ public class KueUlangTahun extends javax.swing.JFrame {
         javax.swing.JSpinner sp = new javax.swing.JSpinner(
                 new javax.swing.SpinnerNumberModel(0, 0, 999, 1)
         );
+        
+        
         qtyRow.add(lQty);
         qtyRow.add(sp);
 
         middle.add(nama);
         middle.add(javax.swing.Box.createVerticalStrut(2));
         middle.add(harga);
+        middle.add(javax.swing.Box.createVerticalStrut(2));
+        middle.add(stokLabel);
         middle.add(javax.swing.Box.createVerticalStrut(6));
         middle.add(qtyRow);
 
@@ -185,15 +196,75 @@ public class KueUlangTahun extends javax.swing.JFrame {
         btn.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
 
         btn.addActionListener(e -> {
-            int jumlah = (Integer) sp.getValue();
-            if (jumlah <= 0) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
-                return;
-            }
-            KeranjangController.getInstance().tambahItem(p, jumlah);
-            javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
-            sp.setValue(0);
-        });
+    int jumlah = (Integer) sp.getValue();
+    if (jumlah <= 0) {
+        JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
+        return;
+    }
+
+    ProductController pc = new ProductController();
+
+    // 1. Ambil stok TERBARU dari DB
+    Model.Product current = pc.ambilById(p.getId());
+    if (current == null) {
+        JOptionPane.showMessageDialog(this, "Produk tidak ditemukan di database");
+        return;
+    }
+
+    int stokSekarang = current.getStock();
+
+    // 2. Kalau sudah habis, jangan bisa dibeli
+    if (stokSekarang <= 0) {
+        JOptionPane.showMessageDialog(this, "Stok sudah habis");
+        stokLabel.setText("Stok: 0 (Habis)");
+        sp.setEnabled(false);
+        btn.setEnabled(false);
+        return;
+    }
+
+    // 3. Cek input user <= stok
+    if (jumlah > stokSekarang) {
+        JOptionPane.showMessageDialog(
+            this,
+            "Stok tidak cukup!\nStok tersedia: " + stokSekarang
+        );
+        return;
+    }
+
+    // 4. Tambah ke keranjang
+    KeranjangController.getInstance().tambahItem(current, jumlah);
+
+    boolean ok = pc.kurangiStok(current.getId(), jumlah);
+    if (!ok) {
+        // stok berubah di menit terakhir, kasih info
+        JOptionPane.showMessageDialog(this, "Stok berubah, silakan coba lagi");
+        Model.Product after = pc.ambilById(current.getId());
+        if (after != null) {
+            stokLabel.setText("Stok: " + after.getStock());
+        }
+        return;
+    }
+
+    // 6. Ambil stok setelah dikurangi & update label
+    Model.Product after = pc.ambilById(current.getId());
+    if (after != null) {
+        int s = after.getStock();
+        stokLabel.setText("Stok: " + s);
+        if (s <= 0) {
+            // kalau habis: disable, dan refresh katalog supaya kartu hilang
+            stokLabel.setText("Stok: 0 (Habis)");
+            sp.setEnabled(false);
+            btn.setEnabled(false);
+
+            // refresh seluruh katalog supaya produk 0 stok hilang
+            SwingUtilities.invokeLater(() -> setupDynamicLayout());
+        }
+    }
+
+    JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
+    sp.setValue(0);
+});
+
 
         javax.swing.JPanel bottom = new javax.swing.JPanel();
         bottom.setOpaque(false);
@@ -834,57 +905,137 @@ public class KueUlangTahun extends javax.swing.JFrame {
     private void bTambahPesananActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bTambahPesananActionPerformed
         // TODO add your handling code here:
         int jumlah = (int) jKucs.getValue();   
+
     if (jumlah <= 0) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
+        JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
         return;
     }
-    Product p = new Product(9, "Kue Ulang Tahun Coklat Strawberry", 70000.0, 0, "kue", "/View/strawrberry coklat.png"); // ID & harga sesuaikan
-    KeranjangController.getInstance().tambahItem(p, jumlah);
 
-    javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
+    Product p = productController.ambilById(27); 
+
+    if (p == null) {
+        JOptionPane.showMessageDialog(this, "Produk tidak ditemukan di database");
+        return;
+    }
+
+    int stokTersedia = p.getStock();
+
+    // CEK STOK
+    if (jumlah > stokTersedia) {
+        JOptionPane.showMessageDialog(this,
+                "Stok tidak cukup!\nStok tersedia: " + stokTersedia);
+        return;
+    }
+
+    // MASUKKAN KE KERANJANG
+    KeranjangController.getInstance().tambahItem(p, jumlah);
+    
+     productController.kurangiStok(p.getId(), jumlah);
+
+    JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
     jKucs.setValue(0); // reset
     }//GEN-LAST:event_bTambahPesananActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         // TODO add your handling code here:
-        int jumlah = (int) jKutm.getValue();   
+        int jumlah = (int) jKucs.getValue();   
+
     if (jumlah <= 0) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
+        JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
         return;
     }
-    Product p = new Product(10, "Kue Ulang Tahun Matcha", 100000.0, 0, "kue", "/View/matcaha cake.png"); // ID & harga sesuaikan
-    KeranjangController.getInstance().tambahItem(p, jumlah);
 
-    javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
-    jKutm.setValue(0); // reset
+    Product p = productController.ambilById(28); 
+
+    if (p == null) {
+        JOptionPane.showMessageDialog(this, "Produk tidak ditemukan di database");
+        return;
+    }
+
+    int stokTersedia = p.getStock();
+
+    // CEK STOK
+    if (jumlah > stokTersedia) {
+        JOptionPane.showMessageDialog(this,
+                "Stok tidak cukup!\nStok tersedia: " + stokTersedia);
+        return;
+    }
+
+    // MASUKKAN KE KERANJANG
+    KeranjangController.getInstance().tambahItem(p, jumlah);
+    
+     productController.kurangiStok(p.getId(), jumlah);
+
+    JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
+    jKucs.setValue(0); // reset
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
         // TODO add your handling code here:
-         int jumlah = (int) jKutv.getValue();   
+         int jumlah = (int) jKucs.getValue();   
+
     if (jumlah <= 0) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
+        JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
         return;
     }
-    Product p = new Product(11, "Kue Ulang Tahun Vanila", 90000.0, 0, "kue", "/View/vanilla cake.png"); // ID & harga sesuaikan
-    KeranjangController.getInstance().tambahItem(p, jumlah);
 
-    javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
-    jKutv.setValue(0); // reset
+    Product p = productController.ambilById(29); 
+
+    if (p == null) {
+        JOptionPane.showMessageDialog(this, "Produk tidak ditemukan di database");
+        return;
+    }
+
+    int stokTersedia = p.getStock();
+
+    // CEK STOK
+    if (jumlah > stokTersedia) {
+        JOptionPane.showMessageDialog(this,
+                "Stok tidak cukup!\nStok tersedia: " + stokTersedia);
+        return;
+    }
+
+    // MASUKKAN KE KERANJANG
+    KeranjangController.getInstance().tambahItem(p, jumlah);
+    
+     productController.kurangiStok(p.getId(), jumlah);
+
+    JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
+    jKucs.setValue(0); // reset
     }//GEN-LAST:event_jButton7ActionPerformed
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
         // TODO add your handling code here:
-         int jumlah = (int) jKutb.getValue();   
+         int jumlah = (int) jKucs.getValue();   
+
     if (jumlah <= 0) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
+        JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
         return;
     }
-    Product p = new Product(12, "Kue Ulang Tahun Buah", 120000.0, 0, "kue", "/View/buah cake.png"); // ID & harga sesuaikan
-    KeranjangController.getInstance().tambahItem(p, jumlah);
 
-    javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
-    jKutb.setValue(0); // reset
+    Product p = productController.ambilById(30); 
+
+    if (p == null) {
+        JOptionPane.showMessageDialog(this, "Produk tidak ditemukan di database");
+        return;
+    }
+
+    int stokTersedia = p.getStock();
+
+    // CEK STOK
+    if (jumlah > stokTersedia) {
+        JOptionPane.showMessageDialog(this,
+                "Stok tidak cukup!\nStok tersedia: " + stokTersedia);
+        return;
+    }
+
+    // MASUKKAN KE KERANJANG
+    KeranjangController.getInstance().tambahItem(p, jumlah);
+    
+     productController.kurangiStok(p.getId(), jumlah);
+
+    JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
+    jKucs.setValue(0); // reset                            
     }//GEN-LAST:event_jButton8ActionPerformed
 
     private void blistpesananActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_blistpesananActionPerformed

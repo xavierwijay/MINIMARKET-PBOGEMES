@@ -161,4 +161,50 @@ public List<Product> ambilByKategoriTersedia(String kategori) {
     }
     return list;
 }
+    public Product ambilById(int id) {
+    Product p = null;
+    String sql = "SELECT * FROM tbmakanan WHERE product_id = ?";
+
+    try (Connection c = Koneksi.configDB();
+         PreparedStatement pst = c.prepareStatement(sql)) {
+
+        pst.setInt(1, id);
+        try (ResultSet rs = pst.executeQuery()) {
+            if (rs.next()) {
+                p = new Product(
+                    rs.getInt("product_id"),
+                    rs.getString("name"),
+                    rs.getDouble("price"),
+                    rs.getInt("stock"),
+                    rs.getString("category"),
+                    rs.getString("image_path")
+                );
+            }
+        }
+    } catch (Exception e) {
+        System.err.println("Gagal ambilById: " + e.getMessage());
+    }
+
+    return p;
+}
+    public boolean kurangiStok(int productId, int qty) {
+    String sql = "UPDATE tbmakanan " +
+                 "SET stock = stock - ? " +
+                 "WHERE product_id = ? AND stock >= ?";
+
+    try (Connection c = Koneksi.configDB();
+         PreparedStatement pst = c.prepareStatement(sql)) {
+
+        pst.setInt(1, qty);
+        pst.setInt(2, productId);
+        pst.setInt(3, qty);
+
+        int updated = pst.executeUpdate();
+        return updated > 0;   // true = stok berhasil dikurangi
+
+    } catch (SQLException e) {
+        System.err.println("Gagal kurangiStok: " + e.getMessage());
+        return false;
+}
+    } 
 }

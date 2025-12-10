@@ -34,60 +34,65 @@ public class Roti extends javax.swing.JFrame {
     }
     
     private void setupDynamicLayout() {
-    // Ambil produk dari kategori Roti
-    // SESUAIKAN string ini dengan kolom kategori di tabelmu: "ROTI", "roti", dll.
-    java.util.List<Model.Product> items =
-            productController.ambilByKategori("ROTI");
+    // 1. Ambil produk kategori ROTI
+    java.util.List<Product> items = productController.ambilByKategori("ROTI");
 
-    // Bersihkan isi panel coklat bagian bawah
+    // 2. Bersihkan panel coklat (jPanel5) dan pakai BorderLayout
     jPanel5.removeAll();
-
     Color coklat = new Color(209, 186, 155);
     jPanel5.setBackground(coklat);
     jPanel5.setLayout(new BorderLayout());
 
-    // ======= TITLE "Roti" (pakai jLabel4 lama) =======
-    JPanel titlePanel = new JPanel();
+    // 3. Panel judul "Roti" DI-TENGAH
+    JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
     titlePanel.setOpaque(false);
-    titlePanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
-    titlePanel.add(jLabel4);          // label "Roti"
+
+    // pastikan label bisa rata tengah
+    jLabel4.setHorizontalAlignment(SwingConstants.CENTER);
+    titlePanel.add(jLabel4);
+
     jPanel5.add(titlePanel, BorderLayout.NORTH);
 
-    // ======= GRID PRODUK 4 KOLOM =======
+    // 4. GRID 4 KOLOM (card produk)
     JPanel grid = new JPanel(new GridLayout(0, 4, 25, 25));
     grid.setOpaque(false);
+
     for (Product p : items) {
         grid.add(buatCardProduk(p));
     }
 
-    // Bungkus grid supaya ada padding kiri/kanan
+    // 5. WRAPPER dengan padding kiri/kanan supaya tidak nempel tepi
     JPanel wrapper = new JPanel(new BorderLayout());
     wrapper.setOpaque(false);
-    wrapper.setBorder(BorderFactory.createEmptyBorder(20, 60, 20, 60));
+
+    // padding: atas, kiri, bawah, kanan (bisa disesuaikan)
+    wrapper.setBorder(BorderFactory.createEmptyBorder(0, 80, 20, 10));
+
     wrapper.add(grid, BorderLayout.CENTER);
 
-    // ======= SCROLLPANE =======
+    // 6. ScrollPane
     JScrollPane scroll = new JScrollPane(wrapper);
     scroll.setBorder(null);
     scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-    scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+    scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     scroll.getVerticalScrollBar().setUnitIncrement(16);
     scroll.getViewport().setBackground(coklat);
     scroll.setBackground(coklat);
 
+    // 7. Masukkan scroll ke jPanel5
     jPanel5.add(scroll, BorderLayout.CENTER);
-    jPanel5.setPreferredSize(new Dimension(1000, 480));
 
+    // 8. Refresh tampilan
     jPanel5.revalidate();
     jPanel5.repaint();
 }
-    private JPanel buatCardProduk(Product p) {
+   private JPanel buatCardProduk(Product p) {
     JPanel card = new JPanel(new BorderLayout());
     card.setBackground(Color.WHITE);
-    card.setPreferredSize(new Dimension(210, 280));
-    card.setMaximumSize(new Dimension(210, 280));
+    card.setPreferredSize(new Dimension(210, 300));
+    card.setMaximumSize(new Dimension(210, 300));
 
-    // ========= BAGIAN ATAS: GAMBAR =========
+    // ========= ATAS: GAMBAR =========
     JLabel img = new JLabel();
     img.setHorizontalAlignment(SwingConstants.CENTER);
     img.setVerticalAlignment(SwingConstants.CENTER);
@@ -118,7 +123,7 @@ public class Roti extends javax.swing.JFrame {
     imgWrap.add(img, BorderLayout.CENTER);
     card.add(imgWrap, BorderLayout.NORTH);
 
-    // ========= BAGIAN TENGAH: NAMA, HARGA, JUMLAH =========
+    // ========= TENGAH: NAMA, HARGA, JUMLAH =========
     JPanel middle = new JPanel();
     middle.setOpaque(false);
     middle.setLayout(new BoxLayout(middle, BoxLayout.Y_AXIS));
@@ -132,7 +137,10 @@ public class Roti extends javax.swing.JFrame {
     harga.setForeground(new Color(158, 115, 52));
     harga.setFont(new Font("Segoe UI", Font.PLAIN, 12));
     harga.setAlignmentX(0.0f);
-
+    
+    JLabel stokLabel = new JLabel("Stok: " + p.getStock());
+    stokLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    
     JPanel qtyRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
     qtyRow.setOpaque(false);
     qtyRow.setAlignmentX(0.0f);
@@ -145,12 +153,14 @@ public class Roti extends javax.swing.JFrame {
     middle.add(nama);
     middle.add(Box.createVerticalStrut(2));
     middle.add(harga);
+     middle.add(javax.swing.Box.createVerticalStrut(2));
+    middle.add(stokLabel);     
     middle.add(Box.createVerticalStrut(6));
     middle.add(qtyRow);
 
     card.add(middle, BorderLayout.CENTER);
 
-    // ========= BAGIAN BAWAH: TOMBOL =========
+    // ========= BAWAH: TOMBOL =========
     JButton btn = new JButton("Tambahkan Pesanan");
     btn.setBackground(new Color(130, 87, 87));
     btn.setForeground(Color.WHITE);
@@ -158,24 +168,71 @@ public class Roti extends javax.swing.JFrame {
 
     btn.addActionListener(e -> {
         int jumlah = (Integer) sp.getValue();
+
+        // 1. Jumlah harus > 0
         if (jumlah <= 0) {
-            JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
+            javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
             return;
         }
-        KeranjangController.getInstance().tambahItem(p, jumlah);
-        JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
+
+        ProductController pc = new ProductController();
+
+        // 2. Ambil stok terbaru dari DB
+        Model.Product current = pc.ambilById(p.getId());
+        if (current == null) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                    "Produk sudah tidak ada di database");
+            return;
+        }
+
+        // 3. Cek stok cukup
+        if (jumlah > current.getStock()) {
+            javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "Stok tidak cukup! Tersedia: " + current.getStock()
+            );
+            return;
+        }
+
+        // 4. Kurangi stok di DB (tidak boleh minus)
+        boolean ok = pc.kurangiStok(current.getId(), jumlah);
+        if (!ok) {
+            javax.swing.JOptionPane.showMessageDialog(
+                    this,
+                    "Stok baru saja berubah, silakan coba lagi"
+            );
+            return;
+        }
+
+        // 5. Tambah ke keranjang
+        KeranjangController.getInstance().tambahItem(current, jumlah);
+
+        // 6. Ambil stok terbaru lagi & update label di UI
+        Model.Product after = pc.ambilById(current.getId());
+        if (after != null) {
+            stokLabel.setText("Stok: " + after.getStock());
+
+            // kalau sudah habis, sembunyikan card dari katalog
+            if (after.getStock() <= 0) {
+                card.setVisible(false);
+            }
+        }
+
+        javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
         sp.setValue(0);
     });
 
-    JPanel bottom = new JPanel();
+    javax.swing.JPanel bottom = new javax.swing.JPanel();
     bottom.setOpaque(false);
-    bottom.setBorder(BorderFactory.createEmptyBorder(8, 0, 10, 0));
+    bottom.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 0, 10, 0));
     bottom.add(btn);
-    card.add(bottom, BorderLayout.SOUTH);
+
+    card.add(bottom, java.awt.BorderLayout.SOUTH);
 
     return card;
 }
-    private File resolveImageFile(String imagePath) {
+
+   private File resolveImageFile(String imagePath) {
     if (imagePath == null || imagePath.isBlank()) return null;
 
     File f = new File(imagePath);
@@ -199,6 +256,7 @@ private static String formatRupiah(double v) {
     DecimalFormat df = new DecimalFormat("#,###");
     return df.format(v).replace(",", ".");
 }
+
 
 
     
