@@ -1,6 +1,7 @@
 package View;
 
 import Config.Koneksi;
+import java.awt.Desktop;
 import java.awt.Image;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -9,8 +10,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.NumberFormat;
-import java.util.Locale;
+import java.io.File;
+import java.io.IOException;
+import com.itextpdf.text.DocumentException;
+
 
 /**
  *
@@ -19,18 +22,20 @@ import java.util.Locale;
 public class LaporanTransaksiAdmin extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(LaporanTransaksiAdmin.class.getName());
-    private DefaultTableModel modelLaporan;
-    private final NumberFormat rupiah =
-        NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
+    private javax.swing.table.DefaultTableModel modelLaporan;
+    private final java.text.NumberFormat rupiah =
+            java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("id","ID"));
+    private double totalPemasukan = 0.0;
     /**
      * Creates new form LaporanTransaksiAdmin
      */
     public LaporanTransaksiAdmin() {
         initComponents();
-        GambarLogo(Logo, "/View/logo_besar.png");  
+        GambarLogo(Logo, "/View/logo_besar.png");
+
         initTableModel();
         loadDataLaporan();
-        txtTotal.setEditable(false);   
+        txtTotal.setEditable(false);
     }
 
         private void GambarLogo(javax.swing.JLabel label, String resourcePath) {
@@ -47,64 +52,63 @@ public class LaporanTransaksiAdmin extends javax.swing.JFrame {
             label.setIcon(new ImageIcon(image));
         }
 
-// ======== Inisialisasi model tabel laporan ========
-private void initTableModel() {
-    modelLaporan = new DefaultTableModel(
-            new Object[]{"ID", "Tanggal", "Nama", "Role", "Total"}, 0) {
-        @Override
-        public boolean isCellEditable(int row, int column) {
-            return false; // tidak bisa diedit dari tabel
-        }
-    };
-    jTable1.setModel(modelLaporan);
-}
-
-// ======== Load semua transaksi + hitung total pemasukan ========
-private void loadDataLaporan() {
-    modelLaporan.setRowCount(0);
-    double totalSemua = 0.0;
-
-    String sql =
-        "SELECT t.transaction_id, " +
-        "       t.transaction_date, " +
-        "       COALESCE(u.fullname, u.username) AS nama, " +
-        "       u.role, " +
-        "       t.total_amount " +
-        "FROM transactions t " +
-        "LEFT JOIN users u ON t.user_id = u.user_id " +
-        "ORDER BY t.transaction_date DESC";
-
-    java.text.SimpleDateFormat sdf =
-        new java.text.SimpleDateFormat("dd-MM-yyyy HH:mm");
-
-    try (Connection conn = Koneksi.configDB();
-         PreparedStatement ps = conn.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
-
-        while (rs.next()) {
-            int id = rs.getInt("transaction_id");
-            java.sql.Timestamp ts = rs.getTimestamp("transaction_date");
-            String tgl = (ts != null) ? sdf.format(ts) : "-";
-            String nama = rs.getString("nama");
-            String role = rs.getString("role");
-            double total = rs.getDouble("total_amount");
-
-            totalSemua += total;
-
-            modelLaporan.addRow(new Object[]{
-                id, tgl, nama, role, total
-            });
+        // ======== Inisialisasi model tabel laporan ========
+        private void initTableModel() {
+            modelLaporan = new DefaultTableModel(
+                    new Object[]{"ID", "Tanggal", "Nama", "Role", "Total"}, 0) {
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+            jTable1.setModel(modelLaporan);
         }
 
-    } catch (SQLException ex) {
-        logger.log(java.util.logging.Level.SEVERE, "Gagal load laporan", ex);
-        JOptionPane.showMessageDialog(this,
-            "Gagal mengambil data laporan dari database:\n" + ex.getMessage());
-    }
+        // ======== Load semua transaksi + hitung total pemasukan ========
+        private void loadDataLaporan() {
+            modelLaporan.setRowCount(0);
+            totalPemasukan = 0.0;
 
-    // tampilkan total pemasukan di textfield
-    txtTotal.setText(rupiah.format(totalSemua));
-}
+            String sql =
+                "SELECT t.transaction_id, " +
+                "       t.transaction_date, " +
+                "       COALESCE(u.fullname, u.username) AS nama, " +
+                "       u.role, " +
+                "       t.total_amount " +
+                "FROM transactions t " +
+                "LEFT JOIN users u ON t.user_id = u.user_id " +
+                "ORDER BY t.transaction_date DESC";
+
+            java.text.SimpleDateFormat sdf =
+                new java.text.SimpleDateFormat("dd-MM-yyyy HH:mm");
+
+            try (Connection conn = Koneksi.configDB();
+                 PreparedStatement ps = conn.prepareStatement(sql);
+                 ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+                    int id = rs.getInt("transaction_id");
+                    java.sql.Timestamp ts = rs.getTimestamp("transaction_date");
+                    String tgl = (ts != null) ? sdf.format(ts) : "-";
+                    String nama = rs.getString("nama");
+                    String role = rs.getString("role");
+                    double total = rs.getDouble("total_amount");
+
+                    totalPemasukan += total;
+
+                    modelLaporan.addRow(new Object[]{
+                            id, tgl, nama, role, total
+                    });
+                }
+
+            } catch (SQLException ex) {
+                logger.log(java.util.logging.Level.SEVERE, "Gagal load laporan", ex);
+                JOptionPane.showMessageDialog(this,
+                    "Gagal mengambil data laporan dari database:\n" + ex.getMessage());
+            }
+
+            txtTotal.setText(rupiah.format(totalPemasukan));
+        }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -369,6 +373,29 @@ private void loadDataLaporan() {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
+        if (modelLaporan.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "Tidak ada data untuk dicetak.");
+            return;
+        }
+
+        try {
+            File pdf = PdfLaporanKeuangan.buatLaporan(jTable1.getModel(), totalPemasukan);
+            JOptionPane.showMessageDialog(this,
+                "Laporan berhasil dibuat di:\n" + pdf.getAbsolutePath());
+
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().open(pdf);
+            }
+        } catch (IOException | DocumentException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                "Gagal membuat laporan PDF:\n" + ex.getMessage());
+        } catch (Throwable ex) {  // supaya NoClassDefFoundError / error lain juga kelihatan
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                "Terjadi kesalahan saat mencetak laporan:\n"
+                + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void txtTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTotalActionPerformed
