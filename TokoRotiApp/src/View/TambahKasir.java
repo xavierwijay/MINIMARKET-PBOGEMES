@@ -28,7 +28,7 @@ public class TambahKasir extends javax.swing.JFrame {
      */
     public TambahKasir() {
         initComponents();
-        Gambar(Logo, "/View/logo besar.png");
+        Gambar(Logo, "/View/logo_besar.png");
 
         userController = new UserController();
         loadTableKasir();
@@ -266,7 +266,7 @@ public class TambahKasir extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 6, Short.MAX_VALUE)
+                .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 635, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 

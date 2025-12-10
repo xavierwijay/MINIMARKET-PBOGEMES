@@ -1,4 +1,4 @@
-/*
+                                                                                                                    /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
@@ -50,8 +50,7 @@ public class Login extends javax.swing.JFrame {
 
         jPanel1.setBackground(new java.awt.Color(209, 186, 155));
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/logo besar.png"))); // NOI18N
-        jLabel1.setText("jLabel1");
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/View/logo_besar.png"))); // NOI18N
 
         jPanel2.setBackground(new java.awt.Color(234, 222, 207));
 

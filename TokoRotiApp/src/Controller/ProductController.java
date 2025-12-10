@@ -105,4 +105,60 @@ public class ProductController {
         }
         return listProduct;
     }
+    
+    // Controller/ProductController.java
+public List<Product> ambilByKategori(String kategori) {
+     List<Product> list = new ArrayList<>();
+    String sql = "SELECT * FROM tbmakanan WHERE UPPER(category) = UPPER(?)";
+
+    try (Connection c = Koneksi.configDB();
+         PreparedStatement pst = c.prepareStatement(sql)) {
+
+        pst.setString(1, kategori);
+        try (ResultSet rs = pst.executeQuery()) {
+            while (rs.next()) {
+                int id = rs.getInt("product_id");
+                String name = rs.getString("name");
+                double price = rs.getDouble("price");
+                int stock = rs.getInt("stock");
+                String category = rs.getString("category");
+                String imagePath = rs.getString("image_path");
+
+                list.add(new Product(id, name, price, stock, category, imagePath));
+            }
+        }
+
+    } catch (Exception e) {
+        System.err.println("Gagal ambilByKategori: " + e.getMessage());
+    }
+
+    return list;
+}
+
+// Opsional: hanya yang stok > 0
+public List<Product> ambilByKategoriTersedia(String kategori) {
+    List<Product> list = new ArrayList<>();
+    String sql = "SELECT product_id, name, price, stock, category, image_path " +
+                 "FROM tbmakanan WHERE UPPER(category)=UPPER(?) AND stock > 0 " +
+                 "ORDER BY product_id DESC";
+    try (Connection c = Koneksi.configDB();
+         PreparedStatement pst = c.prepareStatement(sql)) {
+        pst.setString(1, kategori);
+        try (ResultSet rs = pst.executeQuery()) {
+            while (rs.next()) {
+                list.add(new Product(
+                    rs.getInt("product_id"),
+                    rs.getString("name"),
+                    rs.getDouble("price"),
+                    rs.getInt("stock"),
+                    rs.getString("category"),
+                    rs.getString("image_path")
+                ));
+            }
+        }
+    } catch (SQLException e) {
+        System.err.println("Gagal ambil by kategori (stok): " + e.getMessage());
+    }
+    return list;
+}
 }

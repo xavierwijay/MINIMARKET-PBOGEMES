@@ -5,9 +5,15 @@
 package View;
 
 import Controller.KeranjangController;
+import Controller.ProductController;
 import Model.Product;
-import javax.swing.JOptionPane;
-
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.text.DecimalFormat;
+import java.util.List;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 /**
  *
  * @author LENOVO
@@ -15,15 +21,186 @@ import javax.swing.JOptionPane;
 public class Roti extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Roti.class.getName());
+    private final ProductController productController = new ProductController();
 
     /**
      * Creates new form Roti
      */
     public Roti() {
         initComponents();
+        setupDynamicLayout();
         
         
     }
+    
+    private void setupDynamicLayout() {
+    // Ambil produk dari kategori Roti
+    // SESUAIKAN string ini dengan kolom kategori di tabelmu: "ROTI", "roti", dll.
+    java.util.List<Model.Product> items =
+            productController.ambilByKategori("ROTI");
+
+    // Bersihkan isi panel coklat bagian bawah
+    jPanel5.removeAll();
+
+    Color coklat = new Color(209, 186, 155);
+    jPanel5.setBackground(coklat);
+    jPanel5.setLayout(new BorderLayout());
+
+    // ======= TITLE "Roti" (pakai jLabel4 lama) =======
+    JPanel titlePanel = new JPanel();
+    titlePanel.setOpaque(false);
+    titlePanel.setBorder(BorderFactory.createEmptyBorder(20, 0, 10, 0));
+    titlePanel.add(jLabel4);          // label "Roti"
+    jPanel5.add(titlePanel, BorderLayout.NORTH);
+
+    // ======= GRID PRODUK 4 KOLOM =======
+    JPanel grid = new JPanel(new GridLayout(0, 4, 25, 25));
+    grid.setOpaque(false);
+    for (Product p : items) {
+        grid.add(buatCardProduk(p));
+    }
+
+    // Bungkus grid supaya ada padding kiri/kanan
+    JPanel wrapper = new JPanel(new BorderLayout());
+    wrapper.setOpaque(false);
+    wrapper.setBorder(BorderFactory.createEmptyBorder(20, 60, 20, 60));
+    wrapper.add(grid, BorderLayout.CENTER);
+
+    // ======= SCROLLPANE =======
+    JScrollPane scroll = new JScrollPane(wrapper);
+    scroll.setBorder(null);
+    scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+    scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+    scroll.getVerticalScrollBar().setUnitIncrement(16);
+    scroll.getViewport().setBackground(coklat);
+    scroll.setBackground(coklat);
+
+    jPanel5.add(scroll, BorderLayout.CENTER);
+    jPanel5.setPreferredSize(new Dimension(1000, 480));
+
+    jPanel5.revalidate();
+    jPanel5.repaint();
+}
+    private JPanel buatCardProduk(Product p) {
+    JPanel card = new JPanel(new BorderLayout());
+    card.setBackground(Color.WHITE);
+    card.setPreferredSize(new Dimension(210, 280));
+    card.setMaximumSize(new Dimension(210, 280));
+
+    // ========= BAGIAN ATAS: GAMBAR =========
+    JLabel img = new JLabel();
+    img.setHorizontalAlignment(SwingConstants.CENTER);
+    img.setVerticalAlignment(SwingConstants.CENTER);
+
+    int targetW = 170;
+    int targetH = 140;
+
+    File f = resolveImageFile(p.getImagePath());
+    if (f != null) {
+        try {
+            BufferedImage bi = ImageIO.read(f);
+            if (bi != null) {
+                Image scaled = bi.getScaledInstance(targetW, targetH, Image.SCALE_SMOOTH);
+                img.setIcon(new ImageIcon(scaled));
+            } else {
+                img.setText("No Image");
+            }
+        } catch (Exception e) {
+            img.setText("No Image");
+        }
+    } else {
+        img.setText("No Image");
+    }
+
+    JPanel imgWrap = new JPanel(new BorderLayout());
+    imgWrap.setOpaque(false);
+    imgWrap.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
+    imgWrap.add(img, BorderLayout.CENTER);
+    card.add(imgWrap, BorderLayout.NORTH);
+
+    // ========= BAGIAN TENGAH: NAMA, HARGA, JUMLAH =========
+    JPanel middle = new JPanel();
+    middle.setOpaque(false);
+    middle.setLayout(new BoxLayout(middle, BoxLayout.Y_AXIS));
+    middle.setBorder(BorderFactory.createEmptyBorder(4, 14, 4, 14));
+
+    JLabel nama = new JLabel(p.getName());
+    nama.setFont(new Font("Segoe UI", Font.BOLD, 12));
+    nama.setAlignmentX(0.0f);
+
+    JLabel harga = new JLabel("Rp. " + formatRupiah(p.getPrice()));
+    harga.setForeground(new Color(158, 115, 52));
+    harga.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+    harga.setAlignmentX(0.0f);
+
+    JPanel qtyRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+    qtyRow.setOpaque(false);
+    qtyRow.setAlignmentX(0.0f);
+
+    JLabel lQty = new JLabel("Jumlah");
+    JSpinner sp = new JSpinner(new SpinnerNumberModel(0, 0, 999, 1));
+    qtyRow.add(lQty);
+    qtyRow.add(sp);
+
+    middle.add(nama);
+    middle.add(Box.createVerticalStrut(2));
+    middle.add(harga);
+    middle.add(Box.createVerticalStrut(6));
+    middle.add(qtyRow);
+
+    card.add(middle, BorderLayout.CENTER);
+
+    // ========= BAGIAN BAWAH: TOMBOL =========
+    JButton btn = new JButton("Tambahkan Pesanan");
+    btn.setBackground(new Color(130, 87, 87));
+    btn.setForeground(Color.WHITE);
+    btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
+
+    btn.addActionListener(e -> {
+        int jumlah = (Integer) sp.getValue();
+        if (jumlah <= 0) {
+            JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
+            return;
+        }
+        KeranjangController.getInstance().tambahItem(p, jumlah);
+        JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
+        sp.setValue(0);
+    });
+
+    JPanel bottom = new JPanel();
+    bottom.setOpaque(false);
+    bottom.setBorder(BorderFactory.createEmptyBorder(8, 0, 10, 0));
+    bottom.add(btn);
+    card.add(bottom, BorderLayout.SOUTH);
+
+    return card;
+}
+    private File resolveImageFile(String imagePath) {
+    if (imagePath == null || imagePath.isBlank()) return null;
+
+    File f = new File(imagePath);
+    if (f.exists()) return f;
+
+    String p = imagePath.startsWith("/") ? imagePath.substring(1) : imagePath;
+
+    f = new File("src/" + p);
+    if (f.exists()) return f;
+
+    f = new File("src/View/" + p);
+    if (f.exists()) return f;
+
+    f = new File("build/classes/" + p);
+    if (f.exists()) return f;
+
+    return null;
+}
+
+private static String formatRupiah(double v) {
+    DecimalFormat df = new DecimalFormat("#,###");
+    return df.format(v).replace(",", ".");
+}
+
+
     
     /**
      * This method is called from within the constructor to initialize the form.

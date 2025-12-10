@@ -23,17 +23,17 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jPanel25" pref="1035" max="32767" attributes="0"/>
+          <Component id="pnlDynamic" pref="1035" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jPanel25" min="-2" pref="689" max="-2" attributes="0"/>
+          <Component id="pnlDynamic" min="-2" pref="689" max="-2" attributes="0"/>
       </Group>
     </DimensionLayout>
   </Layout>
   <SubComponents>
-    <Container class="javax.swing.JPanel" name="jPanel25">
+    <Container class="javax.swing.JPanel" name="pnlDynamic">
       <Properties>
         <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
           <Color blue="dd" green="e7" red="ef" type="rgb"/>

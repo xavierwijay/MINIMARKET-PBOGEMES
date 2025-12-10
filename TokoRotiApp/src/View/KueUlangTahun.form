@@ -70,7 +70,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
+          <Component id="jPanel1" alignment="0" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -93,7 +93,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <Group type="103" groupAlignment="0" max="-2" attributes="0">
                       <Component id="jPanel2" max="32767" attributes="0"/>
-                      <Component id="jPanel5" max="32767" attributes="0"/>
+                      <Component id="pnlDynamic" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
               </Group>
@@ -125,7 +125,7 @@
                   <EmptySpace max="32767" attributes="0"/>
                   <Component id="jPanel3" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="jPanel5" min="-2" max="-2" attributes="0"/>
+                  <Component id="pnlDynamic" min="-2" max="-2" attributes="0"/>
                   <EmptySpace min="-2" pref="1343" max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -230,7 +230,7 @@
             <Property name="text" type="java.lang.String" value="Temukan Roti Pilihan Anda"/>
           </Properties>
         </Component>
-        <Container class="javax.swing.JPanel" name="jPanel5">
+        <Container class="javax.swing.JPanel" name="pnlDynamic">
           <Properties>
             <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
               <Color blue="9b" green="ba" red="d1" type="rgb"/>
@@ -263,7 +263,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
                       <Component id="jLabel4" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="-2" pref="47" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="41" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" max="-2" attributes="0">
                           <Component id="jPanel4" max="32767" attributes="0"/>
                           <Component id="jPanel7" max="32767" attributes="0"/>

@@ -5,6 +5,7 @@
 package View;
 
 import Controller.KeranjangController;
+import Controller.ProductController;
 import Model.Product;
 import javax.swing.JOptionPane;
 
@@ -13,14 +14,203 @@ import javax.swing.JOptionPane;
  * @author LENOVO
  */
 public class KueUlangTahun extends javax.swing.JFrame {
-    
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(KueUlangTahun.class.getName());
 
-    /**
-     * Creates new form User
-     */
+    private static final java.util.logging.Logger logger =
+        java.util.logging.Logger.getLogger(KueUlangTahun.class.getName());
+    private final ProductController productController = new ProductController();
+
+    
     public KueUlangTahun() {
-        initComponents();
+        initComponents();  // panggil komponen bawaan NetBeans
+        setupDynamicLayout(); // isi panel produk (pnlDynamic)
+    }
+
+    private void setupDynamicLayout() {
+        // Ambil data produk dari kategori KUE ULANG TAHUN
+        java.util.List<Model.Product> items =
+                productController.ambilByKategori("KUE ULANG TAHUN");
+
+        // Bersihkan isi lama panel
+        pnlDynamic.removeAll();
+
+        // Warna latar belakang
+        java.awt.Color coklat = new java.awt.Color(209, 186, 155);
+        pnlDynamic.setBackground(coklat);
+        pnlDynamic.setLayout(new java.awt.BorderLayout());
+
+        // === GRID PRODUK ===
+        javax.swing.JPanel grid =
+                new javax.swing.JPanel(new java.awt.GridLayout(0, 4, 25, 25));
+        grid.setOpaque(false);
+        for (Model.Product p : items) {
+            grid.add(buatCardProduk(p));
+        }
+
+        // === PEMBUNGKUS SCROLL ===
+        javax.swing.JPanel wrapper = new javax.swing.JPanel(new java.awt.BorderLayout());
+        wrapper.setOpaque(false);
+        wrapper.setBorder(
+                javax.swing.BorderFactory.createEmptyBorder(10, 25, 20, 10)
+        );
+        wrapper.add(grid, java.awt.BorderLayout.CENTER);
+
+        // === SCROLLPANE ===
+        javax.swing.JScrollPane scroll = new javax.swing.JScrollPane(wrapper);
+        scroll.setBorder(null);
+        scroll.setHorizontalScrollBarPolicy(
+                javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
+        );
+        scroll.setVerticalScrollBarPolicy(
+                javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
+        );
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
+        scroll.getViewport().setBackground(coklat);
+        scroll.setBackground(coklat);
+
+        // Tambahkan scroll ke panel dinamis
+        pnlDynamic.add(scroll, java.awt.BorderLayout.CENTER);
+
+        // Batasi tinggi supaya tidak nutup tulisan atas
+        pnlDynamic.setPreferredSize(new java.awt.Dimension(1000, 480));
+
+        // Refresh tampilan
+        pnlDynamic.revalidate();
+        pnlDynamic.repaint();
+    }
+
+    // =========================
+    //  RESOLVER GAMBAR
+    // =========================
+    private java.io.File resolveImageFile(String imagePath) {
+        if (imagePath == null || imagePath.isBlank()) return null;
+
+        java.io.File f = new java.io.File(imagePath);
+        if (f.exists()) return f;
+
+        String p = imagePath.startsWith("/") ? imagePath.substring(1) : imagePath;
+
+        f = new java.io.File("src/" + p);
+        if (f.exists()) return f;
+
+        f = new java.io.File("src/View/" + p);
+        if (f.exists()) return f;
+
+        f = new java.io.File("build/classes/" + p);
+        if (f.exists()) return f;
+
+        return null;
+    }
+
+    // =========================
+    //  CARD PRODUK
+    // =========================
+    private javax.swing.JPanel buatCardProduk(Model.Product p) {
+        javax.swing.JPanel card = new javax.swing.JPanel(new java.awt.BorderLayout());
+        card.setBackground(java.awt.Color.WHITE);
+        card.setPreferredSize(new java.awt.Dimension(210, 280));
+        card.setMaximumSize(new java.awt.Dimension(210, 280));
+
+        // --------- ATAS: GAMBAR ----------
+        javax.swing.JLabel img = new javax.swing.JLabel();
+        img.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        img.setVerticalAlignment(javax.swing.SwingConstants.CENTER);
+
+        int targetW = 170;
+        int targetH = 140;
+
+        java.io.File f = resolveImageFile(p.getImagePath());
+        if (f != null) {
+            try {
+                java.awt.image.BufferedImage bi = javax.imageio.ImageIO.read(f);
+                if (bi != null) {
+                    java.awt.Image scaled =
+                            bi.getScaledInstance(targetW, targetH, java.awt.Image.SCALE_SMOOTH);
+                    img.setIcon(new javax.swing.ImageIcon(scaled));
+                } else {
+                    img.setText("No Image");
+                }
+            } catch (Exception e) {
+                img.setText("No Image");
+            }
+        } else {
+            img.setText("No Image");
+        }
+
+        javax.swing.JPanel imgWrap = new javax.swing.JPanel(new java.awt.BorderLayout());
+        imgWrap.setOpaque(false);
+        imgWrap.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 0, 10));
+        imgWrap.add(img, java.awt.BorderLayout.CENTER);
+        card.add(imgWrap, java.awt.BorderLayout.NORTH);
+
+        // --------- TENGAH: NAMA, HARGA, JUMLAH ----------
+        javax.swing.JPanel middle = new javax.swing.JPanel();
+        middle.setOpaque(false);
+        middle.setLayout(new javax.swing.BoxLayout(middle, javax.swing.BoxLayout.Y_AXIS));
+        middle.setBorder(javax.swing.BorderFactory.createEmptyBorder(4, 14, 4, 14));
+
+        javax.swing.JLabel nama = new javax.swing.JLabel(p.getName());
+        nama.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
+        nama.setAlignmentX(0.0f);
+
+        javax.swing.JLabel harga = new javax.swing.JLabel("Rp. " + formatRupiah(p.getPrice()));
+        harga.setForeground(new java.awt.Color(158, 115, 52));
+        harga.setFont(new java.awt.Font("Segoe UI", java.awt.Font.PLAIN, 12));
+        harga.setAlignmentX(0.0f);
+
+        javax.swing.JPanel qtyRow = new javax.swing.JPanel(
+                new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 5, 0)
+        );
+        qtyRow.setOpaque(false);
+        qtyRow.setAlignmentX(0.0f);
+
+        javax.swing.JLabel lQty = new javax.swing.JLabel("Jumlah");
+        javax.swing.JSpinner sp = new javax.swing.JSpinner(
+                new javax.swing.SpinnerNumberModel(0, 0, 999, 1)
+        );
+        qtyRow.add(lQty);
+        qtyRow.add(sp);
+
+        middle.add(nama);
+        middle.add(javax.swing.Box.createVerticalStrut(2));
+        middle.add(harga);
+        middle.add(javax.swing.Box.createVerticalStrut(6));
+        middle.add(qtyRow);
+
+        card.add(middle, java.awt.BorderLayout.CENTER);
+
+        // --------- BAWAH: TOMBOL ----------
+        javax.swing.JButton btn = new javax.swing.JButton("Tambahkan Pesanan");
+        btn.setBackground(new java.awt.Color(130, 87, 87));
+        btn.setForeground(java.awt.Color.WHITE);
+        btn.setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
+
+        btn.addActionListener(e -> {
+            int jumlah = (Integer) sp.getValue();
+            if (jumlah <= 0) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
+                return;
+            }
+            KeranjangController.getInstance().tambahItem(p, jumlah);
+            javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
+            sp.setValue(0);
+        });
+
+        javax.swing.JPanel bottom = new javax.swing.JPanel();
+        bottom.setOpaque(false);
+        bottom.setBorder(javax.swing.BorderFactory.createEmptyBorder(8, 0, 10, 0));
+        bottom.add(btn);
+
+        card.add(bottom, java.awt.BorderLayout.SOUTH);
+
+        return card;
+    }
+
+    // =========================
+    //  FORMAT RUPIAH
+    // =========================
+    private static String formatRupiah(double v) {
+        java.text.DecimalFormat df = new java.text.DecimalFormat("#,###");
+        return df.format(v).replace(",", ".");
     }
 
     /**
@@ -46,7 +236,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
         blistpesanan = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        jPanel5 = new javax.swing.JPanel();
+        pnlDynamic = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
@@ -162,7 +352,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel3.setText("Temukan Roti Pilihan Anda");
 
-        jPanel5.setBackground(new java.awt.Color(209, 186, 155));
+        pnlDynamic.setBackground(new java.awt.Color(209, 186, 155));
 
         jPanel4.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -456,11 +646,11 @@ public class KueUlangTahun extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
+        javax.swing.GroupLayout pnlDynamicLayout = new javax.swing.GroupLayout(pnlDynamic);
+        pnlDynamic.setLayout(pnlDynamicLayout);
+        pnlDynamicLayout.setHorizontalGroup(
+            pnlDynamicLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDynamicLayout.createSequentialGroup()
                 .addGap(38, 38, 38)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(40, 40, 40)
@@ -470,18 +660,18 @@ public class KueUlangTahun extends javax.swing.JFrame {
                 .addGap(36, 36, 36)
                 .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(33, 33, 33))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel5Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlDynamicLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel4)
                 .addGap(408, 408, 408))
         );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
+        pnlDynamicLayout.setVerticalGroup(
+            pnlDynamicLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDynamicLayout.createSequentialGroup()
                 .addGap(33, 33, 33)
                 .addComponent(jLabel4)
-                .addGap(47, 47, 47)
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGap(41, 41, 41)
+                .addGroup(pnlDynamicLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -565,7 +755,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(pnlDynamic, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(463, 463, 463)
@@ -591,7 +781,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(pnlDynamic, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(1343, 1343, 1343))
         );
 
@@ -599,7 +789,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -648,7 +838,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
         javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
         return;
     }
-    Product p = new Product(101, "Kue Ulang Tahun Coklat Strawberry", 70000.0, 0, "kue", "/View/strawrberry coklat.png"); // ID & harga sesuaikan
+    Product p = new Product(9, "Kue Ulang Tahun Coklat Strawberry", 70000.0, 0, "kue", "/View/strawrberry coklat.png"); // ID & harga sesuaikan
     KeranjangController.getInstance().tambahItem(p, jumlah);
 
     javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
@@ -662,7 +852,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
         javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
         return;
     }
-    Product p = new Product(102, "Kue Ulang Tahun Matcha", 100000.0, 0, "kue", "/View/matcaha cake.png"); // ID & harga sesuaikan
+    Product p = new Product(10, "Kue Ulang Tahun Matcha", 100000.0, 0, "kue", "/View/matcaha cake.png"); // ID & harga sesuaikan
     KeranjangController.getInstance().tambahItem(p, jumlah);
 
     javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
@@ -676,7 +866,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
         javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
         return;
     }
-    Product p = new Product(103, "Kue Ulang Tahun Vanila", 90000.0, 0, "kue", "/View/vanilla cake.png"); // ID & harga sesuaikan
+    Product p = new Product(11, "Kue Ulang Tahun Vanila", 90000.0, 0, "kue", "/View/vanilla cake.png"); // ID & harga sesuaikan
     KeranjangController.getInstance().tambahItem(p, jumlah);
 
     javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
@@ -690,7 +880,7 @@ public class KueUlangTahun extends javax.swing.JFrame {
         javax.swing.JOptionPane.showMessageDialog(this, "Jumlah harus > 0");
         return;
     }
-    Product p = new Product(104, "Kue Ulang Tahun Buah", 120000.0, 0, "kue", "/View/buah cake.png"); // ID & harga sesuaikan
+    Product p = new Product(12, "Kue Ulang Tahun Buah", 120000.0, 0, "kue", "/View/buah cake.png"); // ID & harga sesuaikan
     KeranjangController.getInstance().tambahItem(p, jumlah);
 
     javax.swing.JOptionPane.showMessageDialog(this, "Ditambahkan ke keranjang");
@@ -793,10 +983,10 @@ public class KueUlangTahun extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
+    private javax.swing.JPanel pnlDynamic;
     // End of variables declaration//GEN-END:variables
 }
