@@ -6,6 +6,8 @@ package View;
 
 import java.awt.Image;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
  *
@@ -18,23 +20,37 @@ public class KelolaPesananAdmin extends javax.swing.JFrame {
     /**
      * Creates new form KelolaPesananAdmin
      */
+    private DefaultTableModel modelTransaksi;
+    private DefaultTableModel modelDetail;
     public KelolaPesananAdmin() {
         initComponents();
         GambarLogo(Logo, "/View/logo_besar.png");  
-    }
 
-        private void GambarLogo(javax.swing.JLabel label, String resourcePath) {
-        ImageIcon imgIco = new ImageIcon(
-            getClass().getResource(resourcePath)
-        );
-        
-        Image image = imgIco.getImage().getScaledInstance(
-                label.getWidth(),
-                label.getHeight(),
-                Image.SCALE_SMOOTH
-        );
+        // sembunyikan komponen yang tidak dipakai:
+        // tanggal, nama pemesan, total harga, metode pembayaran
+        jLabel2.setVisible(false);
+        jLabel3.setVisible(false);
+        jLabel5.setVisible(false);
+        jLabel4.setVisible(false);
+        jTextField2.setVisible(false);
+        jTextField3.setVisible(false);
+        jComboBox1.setVisible(false);
 
-        label.setIcon(new ImageIcon(image));
+        // ubah tombol jadi HAPUS TRANSAKSI
+        jButton1.setText("Hapus Transaksi");
+        jButton1.addActionListener(evt -> hapusTransaksiTerpilih());
+
+        // inisialisasi tabel
+        initTableModels();
+        // isi data transaksi dari database (kamu sambungkan sendiri)
+        loadDataTransaksi();
+
+        // ketika pilih transaksi di tabel atas, tampilkan detail di tabel bawah
+        jTable1.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                tampilkanDetailTransaksiTerpilih();
+            }
+        });
     }
 
     /**

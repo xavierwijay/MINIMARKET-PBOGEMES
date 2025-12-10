@@ -415,14 +415,20 @@ public int hitungTotal(){
 
     private void btnPilihActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPilihActionPerformed
         // TODO add your handling code here:
-        PilihMenu pl = null;
         try {
-            pl = new PilihMenu();
+            PilihMenu pl = new PilihMenu();
+            pl.setLocationRelativeTo(this); // optional: biar muncul di tengah
+            pl.setVisible(true);
+            this.setVisible(false);         // atau this.dispose();
         } catch (SQLException ex) {
-            System.getLogger(Transaksi.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+            logger.log(java.util.logging.Level.SEVERE, "Gagal membuka PilihMenu", ex);
+            javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "Gagal membuka menu.\nCek koneksi database / MakananController.",
+                "Error",
+                javax.swing.JOptionPane.ERROR_MESSAGE
+            );
         }
-        this.setVisible(false);
-        pl.setVisible(true);
     }//GEN-LAST:event_btnPilihActionPerformed
 
     /**

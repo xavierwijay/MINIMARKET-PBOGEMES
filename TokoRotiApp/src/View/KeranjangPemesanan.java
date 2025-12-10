@@ -20,7 +20,6 @@ public class KeranjangPemesanan extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(KeranjangPemesanan.class.getName());
     private final NumberFormat rupiah = NumberFormat.getCurrencyInstance(new Locale("id","ID"));
-    private final javax.swing.DefaultListModel<String> pesananModel = new javax.swing.DefaultListModel<>();
      
     /**
      * Creates new form KeranjangPemesanan
@@ -35,14 +34,31 @@ public class KeranjangPemesanan extends javax.swing.JFrame {
         tbKeranjangPemesanan.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         tbKeranjangPemesanan.setRowSelectionAllowed(true);
         tbKeranjangPemesanan.setColumnSelectionAllowed(false);
-        jJadwal.setMinSelectableDate(new Date());
 
-        jlPesanan.setModel(pesananModel);
+        // tidak dipakai lagi, jadi boleh dihapus atau dibiarkan saja
+        // jJadwal.setMinSelectableDate(new Date());
+
+        // Sembunyikan Nama Pesanan & Tanggal Ambil dari layout
+        jLabel4.setVisible(false);      // label "Nama Pesanan"
+        jScrollPane2.setVisible(false); // scroll jlPesanan
+        jlPesanan.setVisible(false);
+
+        jLabel6.setVisible(false);      // label "Tanggal Ambil"
+        jJadwal.setVisible(false);      // date chooser
+
+        // === ISI OTOMATIS NAMA PEMBELI DARI USER YANG LOGIN ===
+        String namaLogin = Controller.SessionUser.getNamaUser();
+        if (namaLogin != null && !namaLogin.isEmpty()) {
+            txtNamaPembeli.setText(namaLogin);
+            txtNamaPembeli.setEditable(false);   // supaya user tidak perlu & tidak bisa ubah lagi
+        }
+
         txtTotal.setEditable(false);
-        
+
+        // setiap ada perubahan di tabel, total akan dihitung ulang
         Controller.KeranjangController.getInstance()
-        .getTableModel()
-        .addTableModelListener(e -> refreshTotal());
+            .getTableModel()
+            .addTableModelListener(e -> refreshTotal());
         refreshTotal();
     }
     
@@ -65,9 +81,32 @@ public class KeranjangPemesanan extends javax.swing.JFrame {
     }
         
         private void refreshTotal() {
-        double total = KeranjangController.getInstance().getTotal();
-        txtTotal.setText(rupiah.format(total));
-}
+            double total = 0.0;
+
+            javax.swing.table.TableModel model = tbKeranjangPemesanan.getModel();
+            int rowCount = model.getRowCount();
+
+            // MISAL kolom ke-4 (index 3) adalah kolom total/harga
+            // kalau beda, ganti angka 3 dengan index kolom yang benar
+            int HARGA_COLUMN_INDEX = 3;
+
+            for (int row = 0; row < rowCount; row++) {
+                Object value = model.getValueAt(row, HARGA_COLUMN_INDEX);
+                if (value == null) continue;
+
+                if (value instanceof Number) {
+                    total += ((Number) value).doubleValue();
+                } else {
+                    try {
+                        total += Double.parseDouble(value.toString());
+                    } catch (NumberFormatException ex) {
+                        // kalau bukan angka, skip saja
+                    }
+                }
+            }
+
+            txtTotal.setText(rupiah.format(total));
+        }
         
 
     /**
@@ -263,7 +302,6 @@ public class KeranjangPemesanan extends javax.swing.JFrame {
                     .addComponent(txtNamaPembeli, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane12, javax.swing.GroupLayout.PREFERRED_SIZE, 246, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addComponent(jLabel4)
@@ -317,71 +355,58 @@ public class KeranjangPemesanan extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         String namaPembeli = txtNamaPembeli.getText().trim();
-        Date tglAmbil = jJadwal.getDate();
-        new View.Rekening(namaPembeli, tglAmbil).setVisible(true);
 
-    if (namaPembeli.isEmpty()) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Nama pembeli wajib diisi.");
-        txtNamaPembeli.requestFocus();
-        return;
-    }
-    if (Controller.KeranjangController.getInstance().getItems().isEmpty()) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Keranjang masih kosong.");
-        return;
-    }
-    if (tglAmbil == null) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Pilih tanggal ambil terlebih dahulu.");
-        jJadwal.requestFocus();
-        return;
-    }
-    try {
-        new View.Rekening(namaPembeli, tglAmbil).setVisible(true);
-        this.dispose();
-    } catch (Throwable ex) {  // jaga-jaga kalau konstruktor tidak cocok, dll.
-        ex.printStackTrace();
-        javax.swing.JOptionPane.showMessageDialog(this,
-            "Gagal membuka halaman pembayaran:\n" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
-    }
+        if (namaPembeli.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Nama pembeli wajib diisi.");
+            txtNamaPembeli.requestFocus();
+            return;
+        }
+        if (Controller.KeranjangController.getInstance().getItems().isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Keranjang masih kosong.");
+            return;
+        }
+
+        // tanggal ambil otomatis (kalau Rekening masih butuh Date)
+        Date tglAmbil = new Date();
+
+        try {
+            new View.Rekening(namaPembeli, tglAmbil).setVisible(true);
+            this.dispose();
+        } catch (Throwable ex) {
+            ex.printStackTrace();
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "Gagal membuka halaman pembayaran:\n" + ex.getClass().getSimpleName() + ": " + ex.getMessage());
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void bTambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bTambahActionPerformed
         // TODO add your handling code here:
-    int viewRow = tbKeranjangPemesanan.getSelectedRow();
-    if (viewRow < 0) {
-        javax.swing.JOptionPane.showMessageDialog(this, "Pilih item di tabel terlebih dahulu.");
-        return;
-    }
-    int modelRow = tbKeranjangPemesanan.convertRowIndexToModel(viewRow);
-    String nama = (String) Controller.KeranjangController
-                    .getInstance().getTableModel().getValueAt(modelRow, 0);
+        KueUlangTahun kut = new KueUlangTahun();
+        kut.setVisible(true);
+        this.dispose();
 
-    if (!pesananModel.contains(nama)) {
-        pesananModel.addElement(nama);
-    }
     }//GEN-LAST:event_bTambahActionPerformed
 
     private void bHapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bHapusActionPerformed
         // TODO add your handling code here:
-         int idx = jlPesanan.getSelectedIndex();
-    if (idx >= 0) {
-        pesananModel.remove(idx);
-    } else {
-        javax.swing.JOptionPane.showMessageDialog(this, "Pilih item di daftar pesanan dulu.");
-    }
+        int viewRow = tbKeranjangPemesanan.getSelectedRow();
+        if (viewRow < 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Pilih baris yang ingin dihapus di tabel.");
+            return;
+        }
+
+        int modelRow = tbKeranjangPemesanan.convertRowIndexToModel(viewRow);
+
+        javax.swing.table.DefaultTableModel dtm =
+            (javax.swing.table.DefaultTableModel) tbKeranjangPemesanan.getModel();
+        dtm.removeRow(modelRow);
+
+        // setelah hapus, hitung ulang total
+        refreshTotal();
     }//GEN-LAST:event_bHapusActionPerformed
 
     private void tbKeranjangPemesananMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbKeranjangPemesananMouseClicked
         // TODO add your handling code here:
-        int viewRow = tbKeranjangPemesanan.getSelectedRow();
-        if (viewRow >= 0) {
-        int modelRow = tbKeranjangPemesanan.convertRowIndexToModel(viewRow);
-        String nama = (String) Controller.KeranjangController
-                        .getInstance().getTableModel().getValueAt(modelRow, 0);
-
-        if (!pesananModel.contains(nama)) {
-            pesananModel.addElement(nama);
-        }
-        }
     }//GEN-LAST:event_tbKeranjangPemesananMouseClicked
 
     private void txtTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTotalActionPerformed

@@ -219,7 +219,7 @@ public class Login extends javax.swing.JFrame {
         javax.swing.JOptionPane.showMessageDialog(this, "Nama/Username dan Password wajib diisi.");
         return;
     }
-
+    
     Controller.AdminController ac   = new Controller.AdminController();   // admin: fullname+pw
     Controller.KasirController kc   = new Controller.KasirController();   // kasir: username+pw (role 'cashier')
     Controller.UserController uc    = new Controller.UserController();    // user : username+pw (role 'customer')
@@ -228,6 +228,10 @@ public class Login extends javax.swing.JFrame {
         // 1) Admin (fullname + password)
         if (ac.cekLogin(namaInput, password)) {
             javax.swing.JOptionPane.showMessageDialog(this, "Login berhasil.");
+
+            // SIMPAN NAMA USER YANG LOGIN
+            Controller.SessionUser.setNamaUser(namaInput);
+
             new View.AdminDashboard().setVisible(true);
             this.dispose();
             return;
@@ -236,6 +240,10 @@ public class Login extends javax.swing.JFrame {
         // 2) Kasir (username + password, role cashier)
         if (kc.cekLogin(namaInput, password)) {
             javax.swing.JOptionPane.showMessageDialog(this, "Login berhasil.");
+
+            // SIMPAN NAMA USER YANG LOGIN
+            Controller.SessionUser.setNamaUser(namaInput);
+
             new View.Transaksi().setVisible(true);
             this.dispose();
             return;
@@ -244,16 +252,19 @@ public class Login extends javax.swing.JFrame {
         // 3) User (username + password, role customer)
         if (uc.cekLogin(namaInput, password)) {
             javax.swing.JOptionPane.showMessageDialog(this, "Login berhasil.");
+
+            // SIMPAN NAMA USER YANG LOGIN
+            Controller.SessionUser.setNamaUser(namaInput);
+
             new View.Home().setVisible(true);
             this.dispose();
             return;
         }
-
-        javax.swing.JOptionPane.showMessageDialog(this, "Login gagal");
-    } catch (Exception ex) {
-        ex.printStackTrace();
-        javax.swing.JOptionPane.showMessageDialog(this, "Login gagal" + ex.getMessage());
-    }
+            javax.swing.JOptionPane.showMessageDialog(this, "Login gagal");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            javax.swing.JOptionPane.showMessageDialog(this, "Login gagal" + ex.getMessage());
+        }
     }//GEN-LAST:event_bttnLoginActionPerformed
 
     private void jcLPassActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jcLPassActionPerformed
