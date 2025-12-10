@@ -2,16 +2,19 @@ package fafbar.model;
 
 import java.math.BigDecimal;
 
-// Model untuk merepresentasikan SATU ITEM penjualan (satu baris di sales_details)
+/**
+ * Model untuk merepresentasikan SATU ITEM penjualan (satu baris di sales_details)
+ * Dibuat berdasarkan struktur tabel sales_details.
+ */
 public class SaleDetail {
 
     private int id;
-    private int saleId; // FK ke tabel SALES
+    private int saleId; // Tidak digunakan di DB saat ini, tapi bagus untuk model
     private String productCode;
     private String productName;
     private int quantity;
-    private BigDecimal priceAtSale;
-    private BigDecimal discountPerItem;
+    private BigDecimal priceAtSale; // Menggunakan price
+    private BigDecimal discountPerItem; // Ada di model tapi tidak di DB, set ke ZERO
     private BigDecimal subtotal;
 
     // Constructors

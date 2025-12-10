@@ -843,11 +843,14 @@ public SalesFrame(User kasir) {
             JOptionPane.showMessageDialog(this, "Keranjang belanja kosong!", "Peringatan", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
+
         try {
             // Ambil semua data yang dibutuhkan
             String invoiceNum = invoice.getText();
-            double total = Double.parseDouble(txtTotal.getText());
+
+            // FIX KRITIS: Mengambil Subtotal dari txtTotal1
+            double subtotalVal = Double.parseDouble(txtTotal1.getText()); 
+
             double discountVal = Double.parseDouble(discount.getText());
             double grandTotalVal = Double.parseDouble(grandTotal.getText());
             double cashVal = Double.parseDouble(cash.getText());
@@ -858,19 +861,19 @@ public SalesFrame(User kasir) {
                 JOptionPane.showMessageDialog(this, "Uang pembayaran (Cash) kurang!", "Validasi Pembayaran", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            
-            // Panggil Controller untuk menyimpan transaksi
-            String resultMessage = saleController.saveSale(
-                invoiceNum, 
-                kasir, 
-                total, 
-                discountVal, 
-                grandTotalVal, 
-                cashVal, 
-                changeVal, 
-                model // Kirimkan model tabel
-            );
 
+            // Panggil Controller untuk menyimulasikan transaksi
+            // Memanggil saveTransactionHeader dari SaleController
+            String resultMessage = saleController.saveSale( 
+    invoiceNum, 
+    kasir, 
+    subtotalVal, 
+    discountVal, 
+    grandTotalVal, 
+    cashVal, 
+    changeVal,
+    model // Kirim model
+);
             JOptionPane.showMessageDialog(this, resultMessage);
 
             // Jika transaksi sukses, reset form
@@ -883,7 +886,7 @@ public SalesFrame(User kasir) {
         } catch (Exception e) {
             System.err.println("Error saat memproses transaksi: " + e.getMessage());
             e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Terjadi kesalahan sistem saat menyimpan transaksi.", "Error Sistem", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Terjadi kesalahan saat memproses transaksi.", "Error Sistem", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_prosesActionPerformed
 
