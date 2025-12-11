@@ -842,74 +842,73 @@ public SalesFrame(User kasir) {
     }//GEN-LAST:event_txtTotalActionPerformed
 
     private void prosesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_prosesActionPerformed
-     // 1. Validasi Sederhana
+     // 1. Validasi
         if (model.getRowCount() == 0) {
-            JOptionPane.showMessageDialog(this, "Keranjang belanja masih kosong!", "Gagal Proses", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        double changeVal = Double.parseDouble(change.getText());
-        if (changeVal < 0) {
-             JOptionPane.showMessageDialog(this, "Uang tunai kurang! Kembalian tidak boleh negatif.", "Gagal Proses", JOptionPane.ERROR_MESSAGE);
+            javax.swing.JOptionPane.showMessageDialog(this, "Keranjang kosong!", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // ==========================================================
-        // 2. Kumpulkan Semua Data Transaksi (CRITICAL STEP)
-        // ==========================================================
-        List<Object[]> itemsData = new ArrayList<>();
-        for (int i = 0; i < model.getRowCount(); i++) {
-            Object[] rowData = new Object[6]; // ID Barang, Nama, Qty, Harga, Disc Item, Total
-            for (int j = 0; j < 6; j++) {
-                rowData[j] = model.getValueAt(i, j);
+        try {
+            // Ambil nilai angka dari text field
+            double dTotal = Double.parseDouble(txtTotal.getText());
+            double dDisc = discount.getText().isEmpty() ? 0 : Double.parseDouble(discount.getText());
+            double dGrand = Double.parseDouble(grandTotal.getText());
+            double dCash = Double.parseDouble(cash.getText());
+            double dChange = Double.parseDouble(change.getText());
+
+            // Cek pembayaran
+            if (dCash < dGrand) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Uang pembayaran kurang!", "Gagal", javax.swing.JOptionPane.WARNING_MESSAGE);
+                return;
             }
-            itemsData.add(rowData);
-        }
 
-        String invoiceNum = invoice.getText();
-        String kasirName = lblKasir.getText(); 
-        double subTotal = Double.parseDouble(txtTotal1.getText()); // Total (sebelum diskon)
-        double discountVal = Double.parseDouble(discount.getText());
-        double grandTotalVal = Double.parseDouble(grandTotal.getText());
-        double cashVal = Double.parseDouble(cash.getText());
-        double changeResult = changeVal;
-        
-        // 3. SIMULASI Simpan Transaksi ke DB (Ganti dengan implementasi saveTransaction)
-     boolean isSaleSaved = true; // Ganti dengan pemanggilan ke Repository
-     
-     if (isSaleSaved) {
-         // 4. CETAK STRUK PDF (Sekarang juga berfungsi membuka file secara otomatis)
-         String pdfFileName = saleController.cetakStrukPDF(
-             invoiceNum, 
-             kasirName, 
-             itemsData, 
-             subTotal, 
-             discountVal, 
-             grandTotalVal, 
-             cashVal, 
-             changeResult
-         );
-         
-         if (pdfFileName != null) {
-             // 4.1. PDF berhasil dibuat dan DIBUKA SECARA OTOMATIS (karena perubahan di Controller)
-             
-             // UBAH: Ganti pop-up 'Berhasil dibuat' dengan notifikasi yang lebih cepat/minimal
-             // Atau, HILANGKAN SAMA SEKALI, karena user sudah melihat PDF terbuka.
-             
-             // Pilihan A: Hilangkan pop-up sama sekali, langsung reset
-    
-             resetFrame(); 
-             
-         } else {
-             // Gagal mencetak PDF
-             JOptionPane.showMessageDialog(this, 
-                     "Gagal membuat file struk PDF. Cek console untuk error.", 
-                     "Error PDF", 
-                     JOptionPane.ERROR_MESSAGE);
-         }
-     } else {
-         JOptionPane.showMessageDialog(this, "Gagal menyimpan data transaksi ke database.", "Error Database", JOptionPane.ERROR_MESSAGE);
-     }
+            // 2. Kumpulkan Data Barang dari Tabel
+            java.util.List<Object[]> items = new java.util.ArrayList<>();
+            for (int i = 0; i < model.getRowCount(); i++) {
+                Object[] row = new Object[6];
+                row[0] = model.getValueAt(i, 0); // Kode
+                row[1] = model.getValueAt(i, 1); // Nama
+                row[2] = model.getValueAt(i, 2); // Qty (Integer)
+                row[3] = model.getValueAt(i, 3); // Harga (Double)
+                row[4] = model.getValueAt(i, 4); // Disc (Double)
+                row[5] = model.getValueAt(i, 5); // Total (Double)
+                items.add(row);
+            }
+
+            // 3. Ambil User ID
+            int userId = (kasir != null) ? kasir.getId() : 1; 
+            String kasirName = (kasir != null) ? kasir.getFullName() : "Admin";
+
+            // 4. Proses Simpan ke Database
+            boolean success = saleController.processSale(
+                invoice.getText(),
+                txtTotal.getText(),
+                discount.getText(),
+                grandTotal.getText(),
+                cash.getText(),
+                change.getText(),
+                userId,
+                items
+            );
+
+            if (success) {
+                // 5. CETAK STRUK (Panggil method baru yang sudah diperbaiki)
+                saleController.cetakStruk(
+                    invoice.getText(), 
+                    kasirName, 
+                    items, 
+                    dTotal, dDisc, dGrand, dCash, dChange
+                );
+
+                // Reset Tampilan
+                resetFrame();
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, "Gagal menyimpan transaksi!", "Error DB", javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (NumberFormatException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Format angka salah!", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_prosesActionPerformed
 
     private void refreshActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_refreshActionPerformed
